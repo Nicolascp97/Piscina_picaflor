@@ -1,3 +1,5 @@
 {
-  "outputDirectory": "piscina-picaflor/build"
+  "buildCommand": "npm --prefix piscina-picaflor run build",
+  "outputDirectory": "piscina-picaflor/build",
+  "installCommand": "npm install && npm --prefix piscina-picaflor install"
 }

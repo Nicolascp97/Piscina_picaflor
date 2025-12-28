@@ -7,8 +7,8 @@ const MediaCarousel = () => {
   const scrollRef = useRef(null);
   
   // Array de medios: videos e imágenes
-const mediaItems = [
-  { type: 'video', src: 'https://res.cloudinary.com/dea2y9hvv/video/upload/f_auto,q_auto,w_1280,so_0/20251227_195609_1_duyx3l.mp4', alt: 'video piscina 1' },
+  const mediaItems = [
+    { type: 'video', src: 'https://res.cloudinary.com/dea2y9hvv/video/upload/f_auto,q_auto,w_1280,so_0/20251227_195609_1_duyx3l.mp4', alt: 'video piscina 1' },
     { type: 'image', src: 'https://i.ibb.co/vp0FyrP/piscina2.avif', alt: 'foto piscina' },
     { type: 'image', src: 'https://i.ibb.co/CppgVBrd/carrusel-eventos.png', alt: 'celbra eventos' },
     { type: 'image', src: 'https://i.ibb.co/7tPc6VqG/celebra-matrimonio.png', alt: 'celebra matrimonio' },
