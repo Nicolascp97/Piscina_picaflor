@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Droplet, Gift, Heart, Sparkles, CheckCircle, QrCode, ChevronLeft, ChevronRight, Play } from 'lucide-react';
+import { Droplet, Gift, Heart, Sparkles, CheckCircle, QrCode, ChevronLeft, ChevronRight, Play, MessageCircle, X, Send } from 'lucide-react';
 
 // Componente de Carrusel Multimedia
 const MediaCarousel = () => {
@@ -8,7 +8,7 @@ const MediaCarousel = () => {
   
   // Array de medios: videos e imágenes
 const mediaItems = [
-  { type: 'video', src: 'https://res.cloudinary.com/dea2y9hvv/video/upload/f_auto,q_auto/matrimonio-dron_yueqdg.mp4' },
+  { type: 'video', src: 'https://res.cloudinary.com/dea2y9hvv/video/upload/f_auto,q_auto,w_1280,so_0/20251227_195609_1_duyx3l.mp4', alt: 'video piscina 1' },
     { type: 'image', src: 'https://i.ibb.co/vp0FyrP/piscina2.avif', alt: 'foto piscina' },
     { type: 'image', src: 'https://i.ibb.co/CppgVBrd/carrusel-eventos.png', alt: 'celbra eventos' },
     { type: 'image', src: 'https://i.ibb.co/7tPc6VqG/celebra-matrimonio.png', alt: 'celebra matrimonio' },
@@ -131,6 +131,7 @@ const mediaItems = [
 
 const PiscinaPicaflorLanding = () => {
   const [scrollY, setScrollY] = useState(0);
+  const [showWhatsAppPopup, setShowWhatsAppPopup] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -151,7 +152,7 @@ const PiscinaPicaflorLanding = () => {
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url(/images/picaflor1.heic)',
+            backgroundImage: 'url(https://raw.githubusercontent.com/user-attachments/assets/your-image.jpg)',
             transform: `translateY(${scrollY * 0.5}px)`,
           }}
         >
@@ -377,6 +378,109 @@ const PiscinaPicaflorLanding = () => {
         </div>
       </footer>
 
+      {/* BOTÓN FLOTANTE DE WHATSAPP */}
+      <button
+        onClick={() => setShowWhatsAppPopup(true)}
+        className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-2xl z-50 transform hover:scale-110 transition-all duration-300 animate-pulse-green"
+        aria-label="Contactar por WhatsApp"
+      >
+        <MessageCircle className="w-7 h-7" />
+      </button>
+
+      {/* POPUP DE WHATSAPP */}
+      {showWhatsAppPopup && (
+        <>
+          {/* Overlay oscuro */}
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            onClick={() => setShowWhatsAppPopup(false)}
+          />
+          
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div 
+              className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-scale-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 rounded-t-3xl relative">
+                <button
+                  onClick={() => setShowWhatsAppPopup(false)}
+                  className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                
+                <div className="flex items-center gap-4">
+                  <div className="bg-white/20 backdrop-blur rounded-full p-3">
+                    <MessageCircle className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">
+                      ¡Hablemos por WhatsApp!
+                    </h3>
+                    <p className="text-green-50 text-sm">
+                      Respuesta rápida garantizada
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 space-y-6">
+                <div className="space-y-4">
+                  <p className="text-gray-600 text-lg leading-relaxed">
+                    Estamos listos para ayudarte con tu reserva en <span className="font-semibold text-cyan-600">Piscina Picaflor</span>
+                  </p>
+                  
+                  <div className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-4 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-700">Consulta disponibilidad en tiempo real</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-700">Información sobre precios y horarios</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-700">Reserva tu día perfecto en familia</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Botones de acción */}
+                <div className="space-y-3">
+                  <a
+                    href="https://wa.me/56975003757?text=Hola!%20Quiero%20hacer%20una%20reserva%20en%20Piscina%20Picaflor%20🏊‍♂️"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 text-lg"
+                  >
+                    <MessageCircle className="w-6 h-6" />
+                    Abrir WhatsApp
+                  </a>
+                  
+                  <button
+                    onClick={() => setShowWhatsAppPopup(false)}
+                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-colors duration-300"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+
+                <p className="text-center text-sm text-gray-500">
+                  También puedes llamarnos al: <br/>
+                  <a href="tel:+56975003757" className="text-cyan-600 hover:text-cyan-700 font-semibold">
+                    +56 9 7500 3757
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Custom Animations CSS */}
       <style>{`
         @keyframes fade-in {
@@ -423,8 +527,28 @@ const PiscinaPicaflorLanding = () => {
           }
         }
 
+        @keyframes scale-in {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes pulse-green {
+          0%, 100% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+          }
+          50% {
+            box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
+          }
+        }
+
         .animate-fade-in {
-          animation: fade-in 1s ease-out;
+          animation: fade-in 0.3s ease-out;
         }
 
         .animate-slide-in-left {
@@ -437,6 +561,14 @@ const PiscinaPicaflorLanding = () => {
 
         .animate-fade-in-up {
           animation: fade-in-up 0.8s ease-out;
+        }
+
+        .animate-scale-in {
+          animation: scale-in 0.3s ease-out;
+        }
+
+        .animate-pulse-green {
+          animation: pulse-green 2s infinite;
         }
 
         @keyframes bounce {

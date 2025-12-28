@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "start": "npm --prefix piscina-picaflor start"
+    "start": "npm --prefix piscina-picaflor start",
+    "build": "npm --prefix piscina-picaflor run build",
+    "postinstall": "npm --prefix piscina-picaflor install"
   },
   "dependencies": {
     "lucide-react": "^0.562.0"
