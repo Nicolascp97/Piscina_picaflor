@@ -132,6 +132,14 @@ const MediaCarousel = () => {
 const PiscinaPicaflorLanding = () => {
   const [scrollY, setScrollY] = useState(0);
   const [showWhatsAppPopup, setShowWhatsAppPopup] = useState(false);
+  const [showCardModal, setShowCardModal] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    celular: '',
+    email: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -141,6 +149,113 @@ const PiscinaPicaflorLanding = () => {
 
   const scrollToAction = () => {
     document.getElementById('cta-section').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.nombre.trim()) {
+      errors.nombre = 'El nombre es obligatorio';
+    }
+    
+    if (!formData.celular.trim()) {
+      errors.celular = 'El celular es obligatorio';
+    } else if (!/^\+?569\d{8}$|^\d{9}$/.test(formData.celular.replace(/\s/g, ''))) {
+      errors.celular = 'Formato de celular inválido (+569xxxxxxxx o 9xxxxxxxx)';
+    }
+    
+    if (!formData.email.trim()) {
+      errors.email = 'El correo es obligatorio';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Correo inválido';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    
+    try {
+      // Enviar datos al webhook de n8n
+      const webhookURL = 'https://piscinapicaflor.app.n8n.cloud/webhook/9038baec-90ea-4435-bd1b-ee6d4958b37e';
+      
+      const fechaRegistro = new Date().toLocaleDateString('es-CL', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      const datos = {
+        nombre: formData.nombre,
+        email: formData.email,
+        telefono: formData.celular,
+        fechaRegistro: fechaRegistro,
+        origen: 'Piscina Picaflor Landing',
+        estado: 'Pendiente',
+        puntos: 0
+      };
+      
+      console.log('Enviando datos al webhook:', datos);
+      
+      const response = await fetch(webhookURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datos)
+      });
+
+      console.log('Respuesta del webhook - Status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error del webhook:', response.status, errorText);
+        throw new Error(`Error del servidor: ${response.status}`);
+      }
+
+      const responseData = await response.json().catch(() => ({}));
+      console.log('Respuesta exitosa:', responseData);
+
+      // Mostrar mensaje de éxito
+      alert(`¡Gracias ${formData.nombre}! Tu solicitud ha sido procesada. Pronto recibirás tu tarjeta de beneficios.`);
+      
+      // Limpiar el formulario y cerrar modal
+      setFormData({ nombre: '', celular: '', email: '' });
+      setShowCardModal(false);
+    } catch (error) {
+      console.error('Error al procesar la solicitud:', error);
+      alert(`Error: ${error.message}. Asegúrate de completar correctamente todos los campos.`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCardModalClose = () => {
+    setFormData({ nombre: '', celular: '', email: '' });
+    setFormErrors({});
+    setShowCardModal(false);
   };
 
   return (
@@ -343,7 +458,9 @@ const PiscinaPicaflorLanding = () => {
             Súmate a nuestra familia y comienza a disfrutar de beneficios exclusivos
           </p>
           
-          <button className="bg-white hover:bg-gray-100 text-gray-900 px-12 py-6 rounded-full text-xl md:text-2xl font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3 mb-8">
+          <button 
+            onClick={() => setShowCardModal(true)}
+            className="bg-white hover:bg-gray-100 text-gray-900 px-12 py-6 rounded-full text-xl md:text-2xl font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3 mb-8">
             <Gift className="w-8 h-8" />
             Agregar mi tarjeta de beneficios
           </button>
@@ -476,6 +593,183 @@ const PiscinaPicaflorLanding = () => {
                   </a>
                 </p>
               </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* MODAL DE TARJETA DE BENEFICIOS */}
+      {showCardModal && (
+        <>
+          {/* Overlay oscuro */}
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
+            onClick={handleCardModalClose}
+          />
+          
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div 
+              className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-scale-in max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-cyan-500 to-emerald-500 p-6 rounded-t-3xl relative sticky top-0">
+                <button
+                  onClick={handleCardModalClose}
+                  className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                
+                <div className="flex items-center gap-4 pr-10">
+                  <div className="bg-white/20 backdrop-blur rounded-full p-3">
+                    <Gift className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white">
+                      Tu Tarjeta de Beneficios
+                    </h3>
+                    <p className="text-cyan-50 text-sm">
+                      Completa el formulario para agregar a Google Wallet
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Body */}
+              <form onSubmit={handleFormSubmit} className="p-6 space-y-5">
+                {/* Campo Nombre */}
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">
+                    Nombre Completo <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleFormChange}
+                    placeholder="Tu nombre completo"
+                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${
+                      formErrors.nombre 
+                        ? 'border-red-500 bg-red-50' 
+                        : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
+                    }`}
+                  />
+                  {formErrors.nombre && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                      ✗ {formErrors.nombre}
+                    </p>
+                  )}
+                </div>
+
+                {/* Campo Celular */}
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">
+                    Celular <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="celular"
+                    value={formData.celular}
+                    onChange={handleFormChange}
+                    placeholder="+569 6542 8901 o 96542 8901"
+                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${
+                      formErrors.celular 
+                        ? 'border-red-500 bg-red-50' 
+                        : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
+                    }`}
+                  />
+                  {formErrors.celular && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                      ✗ {formErrors.celular}
+                    </p>
+                  )}
+                  <p className="text-gray-500 text-xs mt-1">
+                    Formato: +569xxxxxxxx o 9xxxxxxxx
+                  </p>
+                </div>
+
+                {/* Campo Email */}
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">
+                    Correo Electrónico <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleFormChange}
+                    placeholder="tu.email@ejemplo.com"
+                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${
+                      formErrors.email 
+                        ? 'border-red-500 bg-red-50' 
+                        : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
+                    }`}
+                  />
+                  {formErrors.email && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                      ✗ {formErrors.email}
+                    </p>
+                  )}
+                </div>
+
+                {/* Info Box */}
+                <div className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-4 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-700 text-sm">
+                      <span className="font-semibold">Acumula puntos</span> en cada visita
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-700 text-sm">
+                      <span className="font-semibold">Acceso directo</span> a Google Wallet
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-700 text-sm">
+                      <span className="font-semibold">Beneficios exclusivos</span> para miembros
+                    </p>
+                  </div>
+                </div>
+
+                {/* Botones de acción */}
+                <div className="space-y-3 pt-4">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transform hover:scale-105 disabled:hover:scale-100 transition-all duration-300 flex items-center justify-center gap-3 text-lg"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        Procesando...
+                      </>
+                    ) : (
+                      <>
+                        <Gift className="w-6 h-6" />
+                        Agregar a Google Wallet
+                      </>
+                    )}
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={handleCardModalClose}
+                    disabled={isSubmitting}
+                    className="w-full bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-colors duration-300"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+
+                <p className="text-center text-xs text-gray-500">
+                  <span className="text-red-500">*</span> Campos obligatorios
+                </p>
+              </form>
             </div>
           </div>
         </>
