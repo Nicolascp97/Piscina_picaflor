@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Droplet, Gift, Heart, Sparkles, CheckCircle, QrCode, ChevronLeft, ChevronRight, Play, MessageCircle, X } from 'lucide-react';
+import { Droplet, Gift, Heart, Sparkles, CheckCircle, QrCode, ChevronLeft, ChevronRight, Play, MessageCircle, X, Send, Smartphone } from 'lucide-react';
 
 // Componente de Carrusel Multimedia
 const MediaCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef(null);
   
-  // Array de medios: videos e imágenes
   const mediaItems = [
     { type: 'video', src: 'https://res.cloudinary.com/dea2y9hvv/video/upload/f_auto,q_auto,w_1280,so_0/20251227_195609_1_duyx3l.mp4', alt: 'video piscina 1' },
     { type: 'image', src: 'https://i.ibb.co/vp0FyrP/piscina2.avif', alt: 'foto piscina' },
-    { type: 'image', src: 'https://i.ibb.co/CppgVBrd/carrusel-eventos.png', alt: 'celbra eventos' },
+    { type: 'image', src: 'https://i.ibb.co/CppgVBrd/carrusel-eventos.png', alt: 'celebra eventos' },
     { type: 'image', src: 'https://i.ibb.co/7tPc6VqG/celebra-matrimonio.png', alt: 'celebra matrimonio' },
     { type: 'image', src: 'https://i.ibb.co/jvgSMGzQ/celebra-graduacion-1.png', alt: 'celebra graduacion' },
     { type: 'image', src: 'https://i.ibb.co/HDFnxVrz/celebra-bautizo.png', alt: 'celebra bautizo' }
@@ -49,7 +48,6 @@ const MediaCarousel = () => {
 
   return (
     <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-900">
-      {/* Carrusel principal */}
       <div 
         ref={scrollRef}
         onScroll={handleScroll}
@@ -57,20 +55,11 @@ const MediaCarousel = () => {
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {mediaItems.map((item, index) => (
-          <div 
-            key={index}
-            className="min-w-full snap-center relative"
-          >
+          <div key={index} className="min-w-full snap-center relative">
             {item.type === 'video' ? (
               <div className="relative w-full h-[400px] md:h-[500px] bg-black">
-                <video 
-                  className="w-full h-full object-cover"
-                  controls
-                  playsInline
-                  preload="metadata"
-                >
+                <video className="w-full h-full object-cover" controls playsInline preload="metadata">
                   <source src={item.src} type="video/mp4" />
-                  Tu navegador no soporta videos HTML5.
                 </video>
                 <div className="absolute top-4 left-4 bg-rose-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
                   <Play className="w-4 h-4" />
@@ -78,50 +67,25 @@ const MediaCarousel = () => {
                 </div>
               </div>
             ) : (
-              <img 
-                src={item.src}
-                alt={item.alt}
-                className="w-full h-[400px] md:h-[500px] object-cover"
-                loading="lazy"
-              />
+              <img src={item.src} alt={item.alt} className="w-full h-[400px] md:h-[500px] object-cover" loading="lazy" />
             )}
           </div>
         ))}
       </div>
 
-      {/* Controles de navegación - Desktop */}
-      <button 
-        onClick={prevSlide}
-        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-xl transition-all duration-300 hover:scale-110 z-10"
-        aria-label="Anterior"
-      >
+      <button onClick={prevSlide} className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-xl transition-all duration-300 hover:scale-110 z-10">
         <ChevronLeft className="w-6 h-6" />
       </button>
-      <button 
-        onClick={nextSlide}
-        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-xl transition-all duration-300 hover:scale-110 z-10"
-        aria-label="Siguiente"
-      >
+      <button onClick={nextSlide} className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-xl transition-all duration-300 hover:scale-110 z-10">
         <ChevronRight className="w-6 h-6" />
       </button>
 
-      {/* Indicadores */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {mediaItems.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => scrollToIndex(index)}
-            className={`transition-all duration-300 rounded-full ${
-              index === currentIndex 
-                ? 'bg-white w-8 h-2' 
-                : 'bg-white/50 w-2 h-2 hover:bg-white/75'
-            }`}
-            aria-label={`Ir a imagen ${index + 1}`}
-          />
+          <button key={index} onClick={() => scrollToIndex(index)} className={`transition-all duration-300 rounded-full ${index === currentIndex ? 'bg-white w-8 h-2' : 'bg-white/50 w-2 h-2 hover:bg-white/75'}`} />
         ))}
       </div>
 
-      {/* Contador móvil */}
       <div className="absolute top-4 right-4 bg-gray-900/80 text-white px-3 py-1.5 rounded-full text-sm font-semibold backdrop-blur">
         {currentIndex + 1} / {mediaItems.length}
       </div>
@@ -132,14 +96,10 @@ const MediaCarousel = () => {
 const PiscinaPicaflorLanding = () => {
   const [scrollY, setScrollY] = useState(0);
   const [showWhatsAppPopup, setShowWhatsAppPopup] = useState(false);
-  const [showCardModal, setShowCardModal] = useState(false);
-  const [formData, setFormData] = useState({
-    nombre: '',
-    celular: '',
-    email: ''
-  });
-  const [formErrors, setFormErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showWalletPopup, setShowWalletPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [passUrl, setPassUrl] = useState('');
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -151,111 +111,59 @@ const PiscinaPicaflorLanding = () => {
     document.getElementById('cta-section').scrollIntoView({ behavior: 'smooth' });
   };
 
-  const validateForm = () => {
-    const errors = {};
-    
-    if (!formData.nombre.trim()) {
-      errors.nombre = 'El nombre es obligatorio';
-    }
-    
-    if (!formData.celular.trim()) {
-      errors.celular = 'El celular es obligatorio';
-    } else if (!/^\+?569\d{8}$|^\d{9}$/.test(formData.celular.replace(/\s/g, ''))) {
-      errors.celular = 'Formato de celular inválido (+569xxxxxxxx o 9xxxxxxxx)';
-    }
-    
-    if (!formData.email.trim()) {
-      errors.email = 'El correo es obligatorio';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Correo inválido';
-    }
-    
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    if (formErrors[name]) {
-      setFormErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const handleFormSubmit = async (e) => {
+  const handleWalletSubmit = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    submitButton.innerHTML = '<div class="flex items-center justify-center gap-2"><div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div><span>Creando tu tarjeta...</span></div>';
+    submitButton.disabled = true;
 
-    setIsSubmitting(true);
-    
     try {
-      // Enviar datos al webhook de n8n
-      const webhookURL = 'https://piscinapicaflor.app.n8n.cloud/webhook/9038baec-90ea-4435-bd1b-ee6d4958b37e';
-      
-      const fechaRegistro = new Date().toLocaleDateString('es-CL', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      
-      const datos = {
-        nombre: formData.nombre,
-        email: formData.email,
-        telefono: formData.celular,
-        fechaRegistro: fechaRegistro,
-        origen: 'Piscina Picaflor Landing',
-        estado: 'Pendiente',
-        puntos: 0
-      };
-      
-      console.log('Enviando datos al webhook:', datos);
-      
-      const response = await fetch(webhookURL, {
+      const response = await fetch('https://piscinapicaflor.app.n8n.cloud/webhook-test/9038baec-90ea-4435-bd1b-ee6d4958b37e', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(datos)
+        body: JSON.stringify({
+          nombre: formData.name,
+          email: formData.email,
+          telefono: formData.phone || 'No proporcionado',
+          fecha_registro: new Date().toISOString(),
+          origen: 'Landing Page',
+        }),
       });
 
-      console.log('Respuesta del webhook - Status:', response.status);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error del webhook:', response.status, errorText);
-        throw new Error(`Error del servidor: ${response.status}`);
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setPassUrl(result.data.passUrl);
+        setShowWalletPopup(false);
+        setShowSuccessPopup(true);
+        setFormData({ name: '', email: '', phone: '' });
+      } else {
+        throw new Error(result.message || 'Error al crear la tarjeta');
       }
-
-      const responseData = await response.json().catch(() => ({}));
-      console.log('Respuesta exitosa:', responseData);
-
-      // Mostrar mensaje de éxito
-      alert(`¡Gracias ${formData.nombre}! Tu solicitud ha sido procesada. Pronto recibirás tu tarjeta de beneficios.`);
-      
-      // Limpiar el formulario y cerrar modal
-      setFormData({ nombre: '', celular: '', email: '' });
-      setShowCardModal(false);
     } catch (error) {
-      console.error('Error al procesar la solicitud:', error);
-      alert(`Error: ${error.message}. Asegúrate de completar correctamente todos los campos.`);
+      console.error('Error al crear tarjeta:', error);
+      
+      const continuar = confirm(
+        'Hubo un problema técnico al crear tu tarjeta automáticamente.\n\n' +
+        '¿Quieres que te ayudemos por WhatsApp?\n' +
+        'Te generaremos tu tarjeta manualmente en minutos.'
+      );
+      
+      if (continuar) {
+        const message = `Hola! Quiero mi tarjeta de Piscina Picaflor 🏊‍♂️%0A%0ANombre: ${formData.name}%0AEmail: ${formData.email}%0ATeléfono: ${formData.phone || 'No proporcionado'}%0A%0AHubo un error técnico en el registro automático.`;
+        window.open(`https://wa.me/56975003757?text=${message}`, '_blank');
+      }
+      
+      setShowWalletPopup(false);
+      setFormData({ name: '', email: '', phone: '' });
     } finally {
-      setIsSubmitting(false);
+      submitButton.innerHTML = originalText;
+      submitButton.disabled = false;
     }
-  };
-
-  const handleCardModalClose = () => {
-    setFormData({ nombre: '', celular: '', email: '' });
-    setFormErrors({});
-    setShowCardModal(false);
   };
 
   return (
@@ -263,18 +171,13 @@ const PiscinaPicaflorLanding = () => {
       
       {/* HERO SECTION */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Parallax */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: 'url(https://raw.githubusercontent.com/user-attachments/assets/your-image.jpg)',
+        <div className="absolute inset-0 bg-cover bg-center" style={{
+            backgroundImage: 'url(https://i.ibb.co/vp0FyrP/piscina2.avif)',
             transform: `translateY(${scrollY * 0.5}px)`,
-          }}
-        >
+          }}>
           <div className="absolute inset-0 bg-gradient-to-b from-gray-900/75 via-cyan-900/70 to-gray-900/80"></div>
         </div>
 
-        {/* Hero Content */}
         <div className="relative z-10 text-center px-6 max-w-4xl animate-fade-in">
           <div className="mb-6 inline-block">
             <Droplet className="w-16 h-16 text-cyan-300 mx-auto drop-shadow-lg" style={{filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'}} />
@@ -285,16 +188,12 @@ const PiscinaPicaflorLanding = () => {
           <p className="text-xl md:text-2xl text-cyan-100 mb-10 font-light tracking-wide" style={{textShadow: '0 2px 12px rgba(0,0,0,0.8)'}}>
             Piscina Picaflor · Experiencia premium en Litueche
           </p>
-          <button 
-            onClick={scrollToAction}
-            className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white px-10 py-5 rounded-full text-lg md:text-xl font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
-          >
+          <button onClick={scrollToAction} className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white px-10 py-5 rounded-full text-lg md:text-xl font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3">
             <Sparkles className="w-6 h-6" />
             Sumarme al programa de puntos
           </button>
         </div>
 
-        {/* Scroll Indicator */}
         <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
             <div className="w-1.5 h-3 bg-white/70 rounded-full mt-2"></div>
@@ -345,7 +244,6 @@ const PiscinaPicaflorLanding = () => {
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 mb-12">
-            {/* Step 1 */}
             <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up">
               <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <QrCode className="w-10 h-10 text-white" />
@@ -356,7 +254,6 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Step 2 */}
             <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up" style={{animationDelay: '0.15s'}}>
               <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Droplet className="w-10 h-10 text-white" />
@@ -367,7 +264,6 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Step 3 - NEW: Referidos */}
             <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up" style={{animationDelay: '0.3s'}}>
               <div className="bg-gradient-to-br from-purple-500 to-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Heart className="w-10 h-10 text-white" />
@@ -378,7 +274,6 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Step 4 */}
             <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up" style={{animationDelay: '0.45s'}}>
               <div className="bg-gradient-to-br from-rose-500 to-rose-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Gift className="w-10 h-10 text-white" />
@@ -409,7 +304,6 @@ const PiscinaPicaflorLanding = () => {
           </p>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Benefit 1 */}
             <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300 animate-fade-in-up">
               <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="w-8 h-8 text-emerald-600" />
@@ -420,7 +314,6 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Benefit 2 */}
             <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
               <div className="bg-cyan-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Sparkles className="w-8 h-8 text-cyan-600" />
@@ -431,7 +324,6 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Benefit 3 */}
             <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300 animate-fade-in-up" style={{animationDelay: '0.4s'}}>
               <div className="bg-rose-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Heart className="w-8 h-8 text-rose-600" />
@@ -459,8 +351,9 @@ const PiscinaPicaflorLanding = () => {
           </p>
           
           <button 
-            onClick={() => setShowCardModal(true)}
-            className="bg-white hover:bg-gray-100 text-gray-900 px-12 py-6 rounded-full text-xl md:text-2xl font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3 mb-8">
+            onClick={() => setShowWalletPopup(true)}
+            className="bg-white hover:bg-gray-100 text-gray-900 px-12 py-6 rounded-full text-xl md:text-2xl font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3 mb-8"
+          >
             <Gift className="w-8 h-8" />
             Agregar mi tarjeta de beneficios
           </button>
@@ -495,36 +388,15 @@ const PiscinaPicaflorLanding = () => {
         </div>
       </footer>
 
-      {/* BOTÓN FLOTANTE DE WHATSAPP */}
-      <button
-        onClick={() => setShowWhatsAppPopup(true)}
-        className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-2xl z-50 transform hover:scale-110 transition-all duration-300 animate-pulse-green"
-        aria-label="Contactar por WhatsApp"
-      >
-        <MessageCircle className="w-7 h-7" />
-      </button>
-
-      {/* POPUP DE WHATSAPP */}
+      {/* POPUP WHATSAPP */}
       {showWhatsAppPopup && (
         <>
-          {/* Overlay oscuro */}
-          <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
-            onClick={() => setShowWhatsAppPopup(false)}
-          />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in" onClick={() => setShowWhatsAppPopup(false)} />
           
-          {/* Modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-            <div 
-              className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-scale-in"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
+            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-scale-in" onClick={(e) => e.stopPropagation()}>
               <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 rounded-t-3xl relative">
-                <button
-                  onClick={() => setShowWhatsAppPopup(false)}
-                  className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
-                >
+                <button onClick={() => setShowWhatsAppPopup(false)} className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors">
                   <X className="w-6 h-6" />
                 </button>
                 
@@ -533,64 +405,46 @@ const PiscinaPicaflorLanding = () => {
                     <MessageCircle className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white">
-                      ¡Hablemos por WhatsApp!
-                    </h3>
-                    <p className="text-green-50 text-sm">
-                      Respuesta rápida garantizada
-                    </p>
+                    <h3 className="text-2xl font-bold text-white">¡Hablemos por WhatsApp!</h3>
+                    <p className="text-green-50 text-sm">Respuesta rápida garantizada</p>
                   </div>
                 </div>
               </div>
 
-              {/* Body */}
               <div className="p-6 space-y-6">
-                <div className="space-y-4">
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    Estamos listos para ayudarte con tu reserva en <span className="font-semibold text-cyan-600">Piscina Picaflor</span>
-                  </p>
-                  
-                  <div className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-4 space-y-3">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-gray-700">Consulta disponibilidad en tiempo real</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-gray-700">Información sobre precios y horarios</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-gray-700">Reserva tu día perfecto en familia</p>
-                    </div>
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Estamos listos para ayudarte con tu reserva en <span className="font-semibold text-cyan-600">Piscina Picaflor</span>
+                </p>
+                
+                <div className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-700">Consulta disponibilidad en tiempo real</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-700">Información sobre precios y horarios</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-gray-700">Reserva tu día perfecto en familia</p>
                   </div>
                 </div>
 
-                {/* Botones de acción */}
                 <div className="space-y-3">
-                  <a
-                    href="https://wa.me/56975003757?text=Hola!%20Quiero%20hacer%20una%20reserva%20en%20Piscina%20Picaflor%20🏊‍♂️"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 text-lg"
-                  >
+                  <a href="https://wa.me/56975003757?text=Hola!%20Quiero%20hacer%20una%20reserva%20en%20Piscina%20Picaflor%20🏊‍♂️" target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 text-lg">
                     <MessageCircle className="w-6 h-6" />
                     Abrir WhatsApp
                   </a>
                   
-                  <button
-                    onClick={() => setShowWhatsAppPopup(false)}
-                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-colors duration-300"
-                  >
+                  <button onClick={() => setShowWhatsAppPopup(false)} className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-colors duration-300">
                     Cerrar
                   </button>
                 </div>
 
                 <p className="text-center text-sm text-gray-500">
                   También puedes llamarnos al: <br/>
-                  <a href="tel:+56975003757" className="text-cyan-600 hover:text-cyan-700 font-semibold">
-                    +56 9 7500 3757
-                  </a>
+                  <a href="tel:+56975003757" className="text-cyan-600 hover:text-cyan-700 font-semibold">+56 9 7500 3757</a>
                 </p>
               </div>
             </div>
@@ -598,295 +452,163 @@ const PiscinaPicaflorLanding = () => {
         </>
       )}
 
-      {/* MODAL DE TARJETA DE BENEFICIOS */}
-      {showCardModal && (
+      {/* POPUP WALLET/TARJETA */}
+      {showWalletPopup && (
         <>
-          {/* Overlay oscuro */}
-          <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
-            onClick={handleCardModalClose}
-          />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in" onClick={() => setShowWalletPopup(false)} />
           
-          {/* Modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-            <div 
-              className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-scale-in max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="bg-gradient-to-r from-cyan-500 to-emerald-500 p-6 rounded-t-3xl relative sticky top-0">
-                <button
-                  onClick={handleCardModalClose}
-                  className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
-                >
+            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-scale-in overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="bg-gradient-to-r from-cyan-500 to-emerald-500 p-6 relative">
+                <button onClick={() => setShowWalletPopup(false)} className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors">
                   <X className="w-6 h-6" />
                 </button>
                 
-                <div className="flex items-center gap-4 pr-10">
+                <div className="flex items-center gap-4">
                   <div className="bg-white/20 backdrop-blur rounded-full p-3">
-                    <Gift className="w-8 h-8 text-white" />
+                    <Smartphone className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white">
-                      Tu Tarjeta de Beneficios
-                    </h3>
-                    <p className="text-cyan-50 text-sm">
-                      Completa el formulario para agregar a Google Wallet
-                    </p>
+                    <h3 className="text-2xl font-bold text-white">Tu Tarjeta Digital</h3>
+                    <p className="text-cyan-50 text-sm">Compatible con Google & Apple Wallet</p>
                   </div>
                 </div>
               </div>
 
-              {/* Body */}
-              <form onSubmit={handleFormSubmit} className="p-6 space-y-5">
-                {/* Campo Nombre */}
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">
-                    Nombre Completo <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleFormChange}
-                    placeholder="Tu nombre completo"
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${
-                      formErrors.nombre 
-                        ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
-                    }`}
-                  />
-                  {formErrors.nombre && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                      ✗ {formErrors.nombre}
-                    </p>
-                  )}
-                </div>
-
-                {/* Campo Celular */}
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">
-                    Celular <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="celular"
-                    value={formData.celular}
-                    onChange={handleFormChange}
-                    placeholder="+569 6542 8901 o 96542 8901"
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${
-                      formErrors.celular 
-                        ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
-                    }`}
-                  />
-                  {formErrors.celular && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                      ✗ {formErrors.celular}
-                    </p>
-                  )}
-                  <p className="text-gray-500 text-xs mt-1">
-                    Formato: +569xxxxxxxx o 9xxxxxxxx
-                  </p>
-                </div>
-
-                {/* Campo Email */}
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">
-                    Correo Electrónico <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleFormChange}
-                    placeholder="tu.email@ejemplo.com"
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${
-                      formErrors.email 
-                        ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
-                    }`}
-                  />
-                  {formErrors.email && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                      ✗ {formErrors.email}
-                    </p>
-                  )}
-                </div>
-
-                {/* Info Box */}
-                <div className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-4 space-y-2">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-gray-700 text-sm">
-                      <span className="font-semibold">Acumula puntos</span> en cada visita
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-gray-700 text-sm">
-                      <span className="font-semibold">Acceso directo</span> a Google Wallet
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-gray-700 text-sm">
-                      <span className="font-semibold">Beneficios exclusivos</span> para miembros
-                    </p>
-                  </div>
-                </div>
-
-                {/* Botones de acción */}
-                <div className="space-y-3 pt-4">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transform hover:scale-105 disabled:hover:scale-100 transition-all duration-300 flex items-center justify-center gap-3 text-lg"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Procesando...
-                      </>
-                    ) : (
-                      <>
-                        <Gift className="w-6 h-6" />
-                        Agregar a Google Wallet
-                      </>
-                    )}
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={handleCardModalClose}
-                    disabled={isSubmitting}
-                    className="w-full bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-colors duration-300"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-
-                <p className="text-center text-xs text-gray-500">
-                  <span className="text-red-500">*</span> Campos obligatorios
+              <div className="p-6">
+                <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                  Regístrate para recibir tu tarjeta digital de beneficios y empezar a acumular puntos
                 </p>
-              </form>
+
+                <form onSubmit={handleWalletSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-gray-700 font-semibold mb-2">Nombre completo</label>
+                    <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-cyan-500 focus:outline-none transition-colors" placeholder="Juan Pérez" />
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-700 font-semibold mb-2">Correo electrónico</label>
+                    <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-cyan-500 focus:outline-none transition-colors" placeholder="juan@ejemplo.com" />
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-700 font-semibold mb-2">Teléfono (opcional)</label>
+                    <input type="tel" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-cyan-500 focus:outline-none transition-colors" placeholder="+56 9 1234 5678" />
+                  </div>
+
+                  <div className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-4 space-y-2">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-gray-700">Acumula puntos automáticamente</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-gray-700">Acceso a recompensas exclusivas</p>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-gray-700">100% gratis, sin costo ni vencimiento</p>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 text-lg">
+                    <Gift className="w-6 h-6" />
+                    Obtener mi tarjeta
+                  </button>
+
+                  <p className="text-center text-xs text-gray-500 mt-4">
+                    Al registrarte, aceptas recibir tu tarjeta digital y comunicaciones sobre el programa de beneficios
+                  </p>
+                </form>
+              </div>
             </div>
           </div>
         </>
       )}
 
-      {/* Custom Animations CSS */}
+      {/* POPUP ÉXITO */}
+      {showSuccessPopup && (
+        <>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in" onClick={() => setShowSuccessPopup(false)} />
+          
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-scale-in" onClick={(e) => e.stopPropagation()}>
+              <div className="text-center pt-8 pb-4">
+                <div className="text-7xl mb-4 animate-bounce-slow">🎉</div>
+                <h3 className="text-3xl font-bold text-gray-800 mb-2">¡Felicidades!</h3>
+                <p className="text-lg text-gray-600 px-6">Tu tarjeta ha sido creada exitosamente</p>
+              </div>
+
+              <div className="px-6 pb-6">
+                <div className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-6 mb-6">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <Gift className="w-8 h-8 text-emerald-600" />
+                    <span className="text-2xl font-bold text-gray-800">20 Puntos</span>
+                  </div>
+                  <p className="text-center text-gray-600">de bienvenida ya están en tu tarjeta</p>
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" />
+                    <p className="text-gray-700">Acumula 100 puntos por cada visita</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" />
+                    <p className="text-gray-700">Gana 50 puntos por cada referido</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" />
+                    <p className="text-gray-700">Canjea recompensas cada 200 puntos</p>
+                  </div>
+                </div>
+
+                <a href={passUrl} className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 text-lg mb-3">
+                  <Smartphone className="w-6 h-6" />
+                  Agregar a mi Wallet
+                </a>
+
+                <button onClick={() => setShowSuccessPopup(false)} className="w-full text-gray-500 hover:text-gray-700 py-2 text-sm">
+                  Lo haré después
+                </button>
+
+                <p className="text-center text-xs text-gray-500 mt-4">
+                  Compatible con Google Wallet y Apple Wallet
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       <style>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slide-in-left {
-          from {
-            opacity: 0;
-            transform: translateX(-50px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes slide-in-right {
-          from {
-            opacity: 0;
-            transform: translateX(50px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @keyframes pulse-green {
-          0%, 100% {
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-          }
-          50% {
-            box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-
-        .animate-slide-in-left {
-          animation: slide-in-left 1s ease-out;
-        }
-
-        .animate-slide-in-right {
-          animation: slide-in-right 1s ease-out;
-        }
-
-        .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out;
-        }
-
-        .animate-scale-in {
-          animation: scale-in 0.3s ease-out;
-        }
-
-        .animate-pulse-green {
-          animation: pulse-green 2s infinite;
-        }
-
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0) translateX(-50%);
-          }
-          50% {
-            transform: translateY(-10px) translateX(-50%);
-          }
-        }
-
-        .animate-bounce {
-          animation: bounce 2s infinite;
-        }
-
-        /* Ocultar scrollbar pero mantener funcionalidad */
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slide-in-left { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slide-in-right { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fade-in-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scale-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 50% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); } }
+        @keyframes fade-in-dramatic { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce-in { from { opacity: 0; transform: scale(0.3); } 50% { transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
+        @keyframes bounce-slow { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes pulse-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0) translateX(-50%); } 50% { transform: translateY(-10px) translateX(-50%); } }
         
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
+        .animate-fade-in { animation: fade-in 0.3s ease-out; }
+        .animate-slide-in-left { animation: slide-in-left 1s ease-out; }
+        .animate-slide-in-right { animation: slide-in-right 1s ease-out; }
+        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out; }
+        .animate-scale-in { animation: scale-in 0.3s ease-out; }
+        .animate-pulse-green { animation: pulse-green 2s infinite; }
+        .animate-fade-in-dramatic { animation: fade-in-dramatic 1s ease-out; }
+        .animate-slide-up { animation: slide-up 1s ease-out forwards; opacity: 0; }
+        .animate-bounce-in { animation: bounce-in 0.6s ease-out; }
+        .animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite; }
+        .animate-pulse-text { animation: pulse-text 2s ease-in-out infinite; }
+        .animate-bounce { animation: bounce 2s infinite; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </div>
   );
