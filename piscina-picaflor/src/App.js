@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Droplet, Gift, Heart, Sparkles, CheckCircle, QrCode, ChevronLeft, ChevronRight, Play, MessageCircle, X } from 'lucide-react';
+import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
+import PortalUsuario from './components/PortalUsuario';
+import BannerReferido from './components/BannerReferido';
+import PopupExito from './components/PopupExito';
 
 // Componente de Carrusel Multimedia
 const MediaCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef(null);
-  
+
   // Array de medios: videos e imágenes
   const mediaItems = [
     { type: 'video', src: 'https://res.cloudinary.com/dea2y9hvv/video/upload/f_auto,q_auto,w_1280,so_0/20251227_195609_1_duyx3l.mp4', alt: 'video piscina 1' },
@@ -50,20 +54,20 @@ const MediaCarousel = () => {
   return (
     <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-900">
       {/* Carrusel principal */}
-      <div 
+      <div
         ref={scrollRef}
         onScroll={handleScroll}
         className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {mediaItems.map((item, index) => (
-          <div 
+          <div
             key={index}
             className="min-w-full snap-center relative"
           >
             {item.type === 'video' ? (
               <div className="relative w-full h-[400px] md:h-[500px] bg-black">
-                <video 
+                <video
                   className="w-full h-full object-cover"
                   controls
                   playsInline
@@ -78,7 +82,7 @@ const MediaCarousel = () => {
                 </div>
               </div>
             ) : (
-              <img 
+              <img
                 src={item.src}
                 alt={item.alt}
                 className="w-full h-[400px] md:h-[500px] object-cover"
@@ -90,14 +94,14 @@ const MediaCarousel = () => {
       </div>
 
       {/* Controles de navegación - Desktop */}
-      <button 
+      <button
         onClick={prevSlide}
         className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-xl transition-all duration-300 hover:scale-110 z-10"
         aria-label="Anterior"
       >
         <ChevronLeft className="w-6 h-6" />
       </button>
-      <button 
+      <button
         onClick={nextSlide}
         className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-xl transition-all duration-300 hover:scale-110 z-10"
         aria-label="Siguiente"
@@ -111,11 +115,10 @@ const MediaCarousel = () => {
           <button
             key={index}
             onClick={() => scrollToIndex(index)}
-            className={`transition-all duration-300 rounded-full ${
-              index === currentIndex 
-                ? 'bg-white w-8 h-2' 
+            className={`transition-all duration-300 rounded-full ${index === currentIndex
+                ? 'bg-white w-8 h-2'
                 : 'bg-white/50 w-2 h-2 hover:bg-white/75'
-            }`}
+              }`}
             aria-label={`Ir a imagen ${index + 1}`}
           />
         ))}
@@ -129,10 +132,14 @@ const MediaCarousel = () => {
   );
 };
 
-const PiscinaPicaflorLanding = () => {
+// Landing Page Content
+const LandingContent = () => {
   const [scrollY, setScrollY] = useState(0);
   const [showWhatsAppPopup, setShowWhatsAppPopup] = useState(false);
   const [showCardModal, setShowCardModal] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [successData, setSuccessData] = useState(null);
+
   const [formData, setFormData] = useState({
     nombre: '',
     celular: '',
@@ -141,11 +148,34 @@ const PiscinaPicaflorLanding = () => {
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Hook para capturar código de referido
+  const { codigoReferido } = useParams();
+  const [nombreReferidor, setNombreReferidor] = useState('');
+
+  // Efecto para scroll
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Efecto para verificar referido
+  useEffect(() => {
+    if (codigoReferido) {
+      // Guardar en localStorage para persistencia si navega
+      localStorage.setItem('referido_por', codigoReferido);
+
+      // Consultar nombre del referidor (opcional, para el banner)
+      fetch(`https://ppicaflor.app.n8n.cloud/webhook/194cdbd0-df8b-43e0-843a-50fdfc3f887d/usuario/${codigoReferido}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setNombreReferidor(data.data.nombre);
+          }
+        })
+        .catch(err => console.error("Error buscando referidor", err));
+    }
+  }, [codigoReferido]);
 
   const scrollToAction = () => {
     document.getElementById('cta-section').scrollIntoView({ behavior: 'smooth' });
@@ -153,23 +183,23 @@ const PiscinaPicaflorLanding = () => {
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.nombre.trim()) {
       errors.nombre = 'El nombre es obligatorio';
     }
-    
+
     if (!formData.celular.trim()) {
       errors.celular = 'El celular es obligatorio';
     } else if (!/^\+?569\d{8}$|^\d{9}$/.test(formData.celular.replace(/\s/g, ''))) {
       errors.celular = 'Formato de celular inválido (+569xxxxxxxx o 9xxxxxxxx)';
     }
-    
+
     if (!formData.email.trim()) {
       errors.email = 'El correo es obligatorio';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = 'Correo inválido';
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -190,63 +220,52 @@ const PiscinaPicaflorLanding = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    
+
     try {
-      // Enviar datos al webhook de n8n
-      const webhookURL = 'https://piscinapicaflor.app.n8n.cloud/webhook-test/9038baec-90ea-4435-bd1b-ee6d4958b37e';
-      
-      const fechaRegistro = new Date().toLocaleDateString('es-CL', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      
+      const webhookURL = 'https://ppicaflor.app.n8n.cloud/webhook/registro';
+
+      const fechaRegistro = new Date().toISOString();
+      const referidoPor = localStorage.getItem('referido_por') || null;
+
       const datos = {
         nombre: formData.nombre,
         email: formData.email,
         telefono: formData.celular,
-        fechaRegistro: fechaRegistro,
         origen: 'Piscina Picaflor Landing',
-        estado: 'Pendiente',
-        puntos: 0
+        fechaRegistro: fechaRegistro,
+        referido_por: referidoPor
       };
-      
-      console.log('Enviando datos al webhook:', datos);
-      
+
+      console.log('Enviando datos:', datos);
+
       const response = await fetch(webhookURL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datos)
       });
 
-      console.log('Respuesta del webhook - Status:', response.status);
-      
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error del webhook:', response.status, errorText);
-        throw new Error(`Error del servidor: ${response.status}`);
+        throw new Error(`Error servidor: ${response.status}`);
       }
 
-      const responseData = await response.json().catch(() => ({}));
-      console.log('Respuesta exitosa:', responseData);
+      const result = await response.json();
+      console.log('Respuesta:', result);
 
-      // Mostrar mensaje de éxito
-      alert(`¡Gracias ${formData.nombre}! Tu solicitud ha sido procesada. Pronto recibirás tu tarjeta de beneficios.`);
-      
-      // Limpiar el formulario y cerrar modal
-      setFormData({ nombre: '', celular: '', email: '' });
-      setShowCardModal(false);
+      if (result.success) {
+        setSuccessData(result.data);
+        setShowCardModal(false);
+        setShowSuccessPopup(true);
+        setFormData({ nombre: '', celular: '', email: '' });
+      } else {
+        throw new Error(result.message || 'Error desconocido');
+      }
+
     } catch (error) {
-      console.error('Error al procesar la solicitud:', error);
-      alert(`Error: ${error.message}. Asegúrate de completar correctamente todos los campos.`);
+      console.error('Error:', error);
+      alert(`Error: ${error.message}. Intenta nuevamente.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -260,11 +279,13 @@ const PiscinaPicaflorLanding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-cyan-50 via-white to-emerald-50">
-      
+
+      {/* Banner de Referido */}
+      {nombreReferidor && <BannerReferido nombreReferidor={nombreReferidor} />}
+
       {/* HERO SECTION */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Parallax */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: 'url(https://raw.githubusercontent.com/user-attachments/assets/your-image.jpg)',
@@ -274,18 +295,17 @@ const PiscinaPicaflorLanding = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-gray-900/75 via-cyan-900/70 to-gray-900/80"></div>
         </div>
 
-        {/* Hero Content */}
         <div className="relative z-10 text-center px-6 max-w-4xl animate-fade-in">
           <div className="mb-6 inline-block">
-            <Droplet className="w-16 h-16 text-cyan-300 mx-auto drop-shadow-lg" style={{filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'}} />
+            <Droplet className="w-16 h-16 text-cyan-300 mx-auto drop-shadow-lg" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))' }} />
           </div>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight" style={{textShadow: '0 4px 20px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.9)'}}>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight" style={{ textShadow: '0 4px 20px rgba(0,0,0,0.8), 0 2px 8px rgba(0,0,0,0.9)' }}>
             Un espacio creado con esfuerzo familiar para que disfrutes sin preocupaciones
           </h1>
-          <p className="text-xl md:text-2xl text-cyan-100 mb-10 font-light tracking-wide" style={{textShadow: '0 2px 12px rgba(0,0,0,0.8)'}}>
+          <p className="text-xl md:text-2xl text-cyan-100 mb-10 font-light tracking-wide" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>
             Piscina Picaflor · Experiencia premium en Litueche
           </p>
-          <button 
+          <button
             onClick={scrollToAction}
             className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white px-10 py-5 rounded-full text-lg md:text-xl font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
           >
@@ -294,7 +314,6 @@ const PiscinaPicaflorLanding = () => {
           </button>
         </div>
 
-        {/* Scroll Indicator */}
         <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
             <div className="w-1.5 h-3 bg-white/70 rounded-full mt-2"></div>
@@ -345,7 +364,6 @@ const PiscinaPicaflorLanding = () => {
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 mb-12">
-            {/* Step 1 */}
             <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up">
               <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <QrCode className="w-10 h-10 text-white" />
@@ -356,8 +374,7 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Step 2 */}
-            <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up" style={{animationDelay: '0.15s'}}>
+            <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
               <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Droplet className="w-10 h-10 text-white" />
               </div>
@@ -367,8 +384,7 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Step 3 - NEW: Referidos */}
-            <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up" style={{animationDelay: '0.3s'}}>
+            <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
               <div className="bg-gradient-to-br from-purple-500 to-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Heart className="w-10 h-10 text-white" />
               </div>
@@ -378,8 +394,7 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Step 4 */}
-            <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up" style={{animationDelay: '0.45s'}}>
+            <div className="bg-white/95 backdrop-blur rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up" style={{ animationDelay: '0.45s' }}>
               <div className="bg-gradient-to-br from-rose-500 to-rose-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Gift className="w-10 h-10 text-white" />
               </div>
@@ -409,7 +424,6 @@ const PiscinaPicaflorLanding = () => {
           </p>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Benefit 1 */}
             <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300 animate-fade-in-up">
               <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="w-8 h-8 text-emerald-600" />
@@ -420,8 +434,7 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Benefit 2 */}
-            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               <div className="bg-cyan-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Sparkles className="w-8 h-8 text-cyan-600" />
               </div>
@@ -431,8 +444,7 @@ const PiscinaPicaflorLanding = () => {
               </p>
             </div>
 
-            {/* Benefit 3 */}
-            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300 animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
               <div className="bg-rose-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Heart className="w-8 h-8 text-rose-600" />
               </div>
@@ -457,8 +469,8 @@ const PiscinaPicaflorLanding = () => {
           <p className="text-xl md:text-2xl text-cyan-100 mb-12 max-w-2xl mx-auto">
             Súmate a nuestra familia y comienza a disfrutar de beneficios exclusivos
           </p>
-          
-          <button 
+
+          <button
             onClick={() => setShowCardModal(true)}
             className="bg-white hover:bg-gray-100 text-gray-900 px-12 py-6 rounded-full text-xl md:text-2xl font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-3 mb-8">
             <Gift className="w-8 h-8" />
@@ -483,7 +495,7 @@ const PiscinaPicaflorLanding = () => {
               Litueche, Chile
             </p>
           </div>
-          
+
           <div className="border-t border-gray-800 pt-8 mt-8">
             <p className="text-gray-400 text-lg mb-4">
               Gracias por apoyar un proyecto familiar local
@@ -507,19 +519,15 @@ const PiscinaPicaflorLanding = () => {
       {/* POPUP DE WHATSAPP */}
       {showWhatsAppPopup && (
         <>
-          {/* Overlay oscuro */}
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
             onClick={() => setShowWhatsAppPopup(false)}
           />
-          
-          {/* Modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-            <div 
+            <div
               className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-scale-in"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
               <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 rounded-t-3xl relative">
                 <button
                   onClick={() => setShowWhatsAppPopup(false)}
@@ -527,7 +535,6 @@ const PiscinaPicaflorLanding = () => {
                 >
                   <X className="w-6 h-6" />
                 </button>
-                
                 <div className="flex items-center gap-4">
                   <div className="bg-white/20 backdrop-blur rounded-full p-3">
                     <MessageCircle className="w-8 h-8 text-white" />
@@ -543,30 +550,18 @@ const PiscinaPicaflorLanding = () => {
                 </div>
               </div>
 
-              {/* Body */}
               <div className="p-6 space-y-6">
                 <div className="space-y-4">
                   <p className="text-gray-600 text-lg leading-relaxed">
                     Estamos listos para ayudarte con tu reserva en <span className="font-semibold text-cyan-600">Piscina Picaflor</span>
                   </p>
-                  
                   <div className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-4 space-y-3">
                     <div className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
                       <p className="text-gray-700">Consulta disponibilidad en tiempo real</p>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-gray-700">Información sobre precios y horarios</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-gray-700">Reserva tu día perfecto en familia</p>
-                    </div>
                   </div>
                 </div>
-
-                {/* Botones de acción */}
                 <div className="space-y-3">
                   <a
                     href="https://wa.me/56975003757?text=Hola!%20Quiero%20hacer%20una%20reserva%20en%20Piscina%20Picaflor%20🏊‍♂️"
@@ -577,7 +572,6 @@ const PiscinaPicaflorLanding = () => {
                     <MessageCircle className="w-6 h-6" />
                     Abrir WhatsApp
                   </a>
-                  
                   <button
                     onClick={() => setShowWhatsAppPopup(false)}
                     className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-colors duration-300"
@@ -585,35 +579,25 @@ const PiscinaPicaflorLanding = () => {
                     Cerrar
                   </button>
                 </div>
-
-                <p className="text-center text-sm text-gray-500">
-                  También puedes llamarnos al: <br/>
-                  <a href="tel:+56975003757" className="text-cyan-600 hover:text-cyan-700 font-semibold">
-                    +56 9 7500 3757
-                  </a>
-                </p>
               </div>
             </div>
           </div>
         </>
       )}
 
-      {/* MODAL DE TARJETA DE BENEFICIOS */}
+      {/* MODAL DE REGISTRO */}
       {showCardModal && (
         <>
-          {/* Overlay oscuro */}
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-fade-in"
             onClick={handleCardModalClose}
           />
-          
-          {/* Modal */}
+
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-            <div 
+            <div
               className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform animate-scale-in max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
               <div className="bg-gradient-to-r from-cyan-500 to-emerald-500 p-6 rounded-t-3xl relative sticky top-0">
                 <button
                   onClick={handleCardModalClose}
@@ -621,7 +605,7 @@ const PiscinaPicaflorLanding = () => {
                 >
                   <X className="w-6 h-6" />
                 </button>
-                
+
                 <div className="flex items-center gap-4 pr-10">
                   <div className="bg-white/20 backdrop-blur rounded-full p-3">
                     <Gift className="w-8 h-8 text-white" />
@@ -631,15 +615,13 @@ const PiscinaPicaflorLanding = () => {
                       Tu Tarjeta de Beneficios
                     </h3>
                     <p className="text-cyan-50 text-sm">
-                      Completa el formulario para agregar a Google Wallet
+                      Completa el formulario para unirte
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Body */}
               <form onSubmit={handleFormSubmit} className="p-6 space-y-5">
-                {/* Campo Nombre */}
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">
                     Nombre Completo <span className="text-red-500">*</span>
@@ -649,21 +631,12 @@ const PiscinaPicaflorLanding = () => {
                     name="nombre"
                     value={formData.nombre}
                     onChange={handleFormChange}
-                    placeholder="Tu nombre completo"
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${
-                      formErrors.nombre 
-                        ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
-                    }`}
+                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${formErrors.nombre ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
+                      }`}
                   />
-                  {formErrors.nombre && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                      ✗ {formErrors.nombre}
-                    </p>
-                  )}
+                  {formErrors.nombre && <p className="text-red-500 text-sm mt-1">{formErrors.nombre}</p>}
                 </div>
 
-                {/* Campo Celular */}
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">
                     Celular <span className="text-red-500">*</span>
@@ -673,24 +646,13 @@ const PiscinaPicaflorLanding = () => {
                     name="celular"
                     value={formData.celular}
                     onChange={handleFormChange}
-                    placeholder="+569 6542 8901 o 96542 8901"
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${
-                      formErrors.celular 
-                        ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
-                    }`}
+                    placeholder="+569 1234 5678"
+                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${formErrors.celular ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
+                      }`}
                   />
-                  {formErrors.celular && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                      ✗ {formErrors.celular}
-                    </p>
-                  )}
-                  <p className="text-gray-500 text-xs mt-1">
-                    Formato: +569xxxxxxxx o 9xxxxxxxx
-                  </p>
+                  {formErrors.celular && <p className="text-red-500 text-sm mt-1">{formErrors.celular}</p>}
                 </div>
 
-                {/* Campo Email */}
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">
                     Correo Electrónico <span className="text-red-500">*</span>
@@ -700,196 +662,77 @@ const PiscinaPicaflorLanding = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleFormChange}
-                    placeholder="tu.email@ejemplo.com"
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${
-                      formErrors.email 
-                        ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
-                    }`}
+                    className={`w-full px-4 py-3 rounded-lg border-2 transition-colors duration-300 focus:outline-none ${formErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-cyan-500 bg-gray-50'
+                      }`}
                   />
-                  {formErrors.email && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                      ✗ {formErrors.email}
-                    </p>
-                  )}
+                  {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
                 </div>
 
-                {/* Info Box */}
-                <div className="bg-gradient-to-br from-cyan-50 to-emerald-50 rounded-2xl p-4 space-y-2">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-gray-700 text-sm">
-                      <span className="font-semibold">Acumula puntos</span> en cada visita
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-gray-700 text-sm">
-                      <span className="font-semibold">Acceso directo</span> a Google Wallet
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-gray-700 text-sm">
-                      <span className="font-semibold">Beneficios exclusivos</span> para miembros
-                    </p>
-                  </div>
-                </div>
-
-                {/* Botones de acción */}
                 <div className="space-y-3 pt-4">
                   <button
                     type="submit"
                     disabled={isSubmitting}
                     className="w-full bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 disabled:from-gray-400 disabled:to-gray-400 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transform hover:scale-105 disabled:hover:scale-100 transition-all duration-300 flex items-center justify-center gap-3 text-lg"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Procesando...
-                      </>
-                    ) : (
+                    {isSubmitting ? 'Procesando...' : (
                       <>
                         <Gift className="w-6 h-6" />
-                        Agregar a Google Wallet
+                        Obtener Tarjeta
                       </>
                     )}
                   </button>
-                  
-                  <button
-                    type="button"
-                    onClick={handleCardModalClose}
-                    disabled={isSubmitting}
-                    className="w-full bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-colors duration-300"
-                  >
-                    Cancelar
-                  </button>
                 </div>
-
-                <p className="text-center text-xs text-gray-500">
-                  <span className="text-red-500">*</span> Campos obligatorios
-                </p>
               </form>
             </div>
           </div>
         </>
       )}
 
-      {/* Custom Animations CSS */}
+      {/* POPUP EXITO */}
+      {showSuccessPopup && (
+        <PopupExito
+          datos={successData}
+          onClose={() => setShowSuccessPopup(false)}
+        />
+      )}
+
       <style>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slide-in-left { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slide-in-right { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fade-in-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scale-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 50% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0) translateX(-50%); } 50% { transform: translateY(-10px) translateX(-50%); } }
 
-        @keyframes slide-in-left {
-          from {
-            opacity: 0;
-            transform: translateX(-50px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
+        .animate-fade-in { animation: fade-in 0.3s ease-out; }
+        .animate-slide-in-left { animation: slide-in-left 1s ease-out; }
+        .animate-slide-in-right { animation: slide-in-right 1s ease-out; }
+        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out; }
+        .animate-scale-in { animation: scale-in 0.3s ease-out; }
+        .animate-pulse-green { animation: pulse-green 2s infinite; }
+        .animate-bounce { animation: bounce 2s infinite; }
 
-        @keyframes slide-in-right {
-          from {
-            opacity: 0;
-            transform: translateX(50px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @keyframes pulse-green {
-          0%, 100% {
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-          }
-          50% {
-            box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-
-        .animate-slide-in-left {
-          animation: slide-in-left 1s ease-out;
-        }
-
-        .animate-slide-in-right {
-          animation: slide-in-right 1s ease-out;
-        }
-
-        .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out;
-        }
-
-        .animate-scale-in {
-          animation: scale-in 0.3s ease-out;
-        }
-
-        .animate-pulse-green {
-          animation: pulse-green 2s infinite;
-        }
-
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0) translateX(-50%);
-          }
-          50% {
-            transform: translateY(-10px) translateX(-50%);
-          }
-        }
-
-        .animate-bounce {
-          animation: bounce 2s infinite;
-        }
-
-        /* Ocultar scrollbar pero mantener funcionalidad */
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </div>
   );
 };
 
-export default PiscinaPicaflorLanding;
+// Main App Component with Routes
+const PiscinaPicaflorApp = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingContent />} />
+        <Route path="/r/:codigoReferido" element={<LandingContent />} />
+        <Route path="/u/:codigo" element={<PortalUsuario />} />
+        {/* Fallback route */}
+        <Route path="*" element={<LandingContent />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default PiscinaPicaflorApp;

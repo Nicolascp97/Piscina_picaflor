@@ -1,0 +1,234 @@
+{
+    "name": "Piscina Picaflor - Consulta Usuario",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "GET",
+                "path": "usuario/:codigo",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "lookup",
+                "fileId": "1sO-XXXXXXXXXX-YOUR_SHEET_ID",
+                "sheetName": "Usuarios",
+                "lookupColumn": "Codigo",
+                "lookupValue": "={{$node[\"Webhook\"].json[\"params\"][\"codigo\"]}}",
+                "options": {}
+            },
+            "name": "Buscar Usuario",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "if (items.length === 0) {\n  return [{ json: { found: false } }];\n}\n\nreturn [{ json: { found: true, user: items[0].json } }];"
+            },
+            "name": "Verificar Existencia",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$json[\"found\"]}}",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "name": "Usuario Existe?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                850,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "download",
+                "fileId": "1sO-XXXXXXXXXX-YOUR_SHEET_ID",
+                "sheetName": "Historial",
+                "options": {
+                    "returnAll": true
+                }
+            },
+            "name": "Leer Historial",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "download",
+                "fileId": "1sO-XXXXXXXXXX-YOUR_SHEET_ID",
+                "sheetName": "Usuarios",
+                "options": {
+                    "returnAll": true
+                }
+            },
+            "name": "Leer Referidos",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "const userParams = $node[\"Webhook\"].json[\"params\"];\nconst userCode = userParams.codigo;\nconst userData = $node[\"Buscar Usuario\"].json;\n\n// Filtrar historial\nconst historial = $node[\"Leer Historial\"].json;\nconst userHistorial = historial.filter(h => h[\"Usuario Codigo\"] === userCode);\n\n// Filtrar referidos\nconst usuarios = $node[\"Leer Referidos\"].json;\nconst referidos = usuarios.filter(u => u[\"Referido Por\"] === userCode).map(u => ({\n  nombre: u.Nombre,\n  codigo: u.Codigo,\n  fecha: u[\"Fecha Registro\"]\n}));\n\nreturn [{\n  json: {\n    success: true,\n    data: {\n      codigo: userData.Codigo,\n      nombre: userData.Nombre,\n      email: userData.Email,\n      puntos: parseInt(userData.Puntos),\n      referido_por: userData[\"Referido Por\"],\n      referidos: referidos,\n      historial: userHistorial.map(h => ({\n        fecha: h.Fecha,\n        tipo: h.Tipo,\n        puntos: parseInt(h.Puntos),\n        descripcion: h.Descripcion\n      }))\n    }\n  }\n}];"
+            },
+            "name": "Preparar Respuesta",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                1250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{JSON.stringify($json)}}",
+                "options": {}
+            },
+            "name": "Respond Success",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{\"success\": false, \"message\": \"Usuario no encontrado\"}",
+                "options": {
+                    "responseCode": 404
+                }
+            },
+            "name": "Respond Error",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                550
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Buscar Usuario",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Buscar Usuario": {
+            "main": [
+                [
+                    {
+                        "node": "Verificar Existencia",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Verificar Existencia": {
+            "main": [
+                [
+                    {
+                        "node": "Usuario Existe?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Usuario Existe?": {
+            "main": [
+                [
+                    {
+                        "node": "Leer Historial",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Leer Referidos",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Respond Error",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Leer Historial": {
+            "main": [
+                [
+                    {
+                        "node": "Preparar Respuesta",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Leer Referidos": {
+            "main": [
+                [
+                    {
+                        "node": "Preparar Respuesta",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Preparar Respuesta": {
+            "main": [
+                [
+                    {
+                        "node": "Respond Success",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

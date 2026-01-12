@@ -1,0 +1,263 @@
+{
+    "name": "Piscina Picaflor - Registro",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "registro",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "download",
+                "fileId": "1sO-XXXXXXXXXX-YOUR_SHEET_ID",
+                "sheetName": "Usuarios",
+                "options": {
+                    "returnAll": true
+                }
+            },
+            "name": "Leer Usuarios",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "// Generar nuevo código\nconst usuarios = items.map(item => item.json);\nlet lastId = 0;\n\nusuarios.forEach(u => {\n  if (u.Codigo && u.Codigo.startsWith('PICA-')) {\n    const num = parseInt(u.Codigo.split('-')[1]);\n    if (num > lastId) lastId = num;\n  }\n});\n\nconst newId = lastId + 1;\nconst newCode = `PICA-${newId.toString().padStart(4, '0')}`;\n\n// Obtener datos del webhook (el nodo anterior no es el webhook, hay que acceder a el pero aqui items viene de Read Users. \n// Mejor usar una variable global o merge data. \n// En este script asumimos que recibimos los datos del webhook via $node[\"Webhook\"].json[\"body\"]\n\nconst webhookData = $node[\"Webhook\"].json[\"body\"];\nconst referidoPor = webhookData.referido_por;\n\nlet puntosIniciales = 20;\nlet esReferido = false;\nlet referidorValido = null;\n\nif (referidoPor && referidoPor !== '') {\n  const referidor = usuarios.find(u => u.Codigo === referidoPor);\n  if (referidor) {\n    puntosIniciales = 70; // 20 + 50 bono\n    esReferido = true;\n    referidorValido = referidor;\n  }\n}\n\nreturn [{\n  json: {\n    newCode,\n    puntosIniciales,\n    esReferido,\n    referidoPor: esReferido ?ReferidoPor : '',\n    referidor: referidorValido,\n    userData: webhookData\n  }\n}];"
+            },
+            "name": "Logica Registro",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "append",
+                "fileId": "1sO-XXXXXXXXXX-YOUR_SHEET_ID",
+                "sheetName": "Usuarios",
+                "columns": {
+                    "Codigo": "={{$json[\"newCode\"]}}",
+                    "Nombre": "={{$json[\"userData\"][\"nombre\"]}}",
+                    "Email": "={{$json[\"userData\"][\"email\"]}}",
+                    "Telefono": "={{$json[\"userData\"][\"telefono\"]}}",
+                    "Puntos": "={{$json[\"puntosIniciales\"]}}",
+                    "Referido Por": "={{$json[\"esReferido\"] ? $json[\"userData\"][\"referido_por\"] : ''}}",
+                    "Fecha Registro": "={{$json[\"userData\"][\"fechaRegistro\"]}}"
+                }
+            },
+            "name": "Guardar Nuevo Usuario",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                850,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "boolean": [
+                        {
+                            "value1": "={{$node[\"Logica Registro\"].json[\"esReferido\"]}}",
+                            "value2": true
+                        }
+                    ]
+                }
+            },
+            "name": "Si es Referido",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "lookup",
+                "fileId": "1sO-XXXXXXXXXX-YOUR_SHEET_ID",
+                "sheetName": "Usuarios",
+                "lookupColumn": "Codigo",
+                "lookupValue": "={{$node[\"Logica Registro\"].json[\"userData\"][\"referido_por\"]}}",
+                "updateKey": "Puntos",
+                "updateValue": "={{parseInt($node[\"Logica Registro\"].json[\"referidor\"][\"Puntos\"]) + 50}}"
+            },
+            "name": "Sumar Puntos Referidor",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                1250,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "append",
+                "fileId": "1sO-XXXXXXXXXX-YOUR_SHEET_ID",
+                "sheetName": "Historial",
+                "columns": {
+                    "Fecha": "={{new Date().toISOString()}}",
+                    "Usuario Codigo": "={{$node[\"Logica Registro\"].json[\"userData\"][\"referido_por\"]}}",
+                    "Tipo": "Referido",
+                    "Puntos": 50,
+                    "Relacionado Con": "={{$node[\"Logica Registro\"].json[\"newCode\"]}}",
+                    "Descripcion": "={{$node[\"Logica Registro\"].json[\"userData\"][\"nombre\"]}} se registró con tu link"
+                }
+            },
+            "name": "Historial Referidor",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                1450,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "append",
+                "fileId": "1sO-XXXXXXXXXX-YOUR_SHEET_ID",
+                "sheetName": "Historial",
+                "columns": {
+                    "Fecha": "={{$json[\"userData\"][\"fechaRegistro\"]}}",
+                    "Usuario Codigo": "={{$json[\"newCode\"]}}",
+                    "Tipo": "Registro",
+                    "Puntos": "={{$json[\"puntosIniciales\"]}}",
+                    "Relacionado Con": "System",
+                    "Descripcion": "Bienvenida al club"
+                }
+            },
+            "name": "Historial Nuevo Usuario",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                1250,
+                450
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={\n  \"success\": true,\n  \"data\": {\n    \"codigo\": \"{{$node[\"Logica Registro\"].json[\"newCode\"]}}\",\n    \"nombre\": \"{{$node[\"Logica Registro\"].json[\"userData\"][\"nombre\"]}}\",\n    \"puntos\": {{$node[\"Logica Registro\"].json[\"puntosIniciales\"]}},\n    \"link_personal\": \"https://piscina-picaflor.vercel.app/u/{{$node[\"Logica Registro\"].json[\"newCode\"]}}\",\n    \"link_referidos\": \"https://piscina-picaflor.vercel.app/r/{{$node[\"Logica Registro\"].json[\"newCode\"]}}\"\n  }\n}",
+                "options": {}
+            },
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1650,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Leer Usuarios",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Leer Usuarios": {
+            "main": [
+                [
+                    {
+                        "node": "Logica Registro",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Logica Registro": {
+            "main": [
+                [
+                    {
+                        "node": "Guardar Nuevo Usuario",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Guardar Nuevo Usuario": {
+            "main": [
+                [
+                    {
+                        "node": "Si es Referido",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Si es Referido": {
+            "main": [
+                [
+                    {
+                        "node": "Sumar Puntos Referidor",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Historial Nuevo Usuario",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Sumar Puntos Referidor": {
+            "main": [
+                [
+                    {
+                        "node": "Historial Referidor",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Historial Referidor": {
+            "main": [
+                [
+                    {
+                        "node": "Historial Nuevo Usuario",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Historial Nuevo Usuario": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
