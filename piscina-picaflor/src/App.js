@@ -166,7 +166,7 @@ const LandingContent = () => {
       localStorage.setItem('referido_por', codigoReferido);
 
       // Consultar nombre del referidor (opcional, para el banner)
-      fetch(`https://ppicaflor.app.n8n.cloud/webhook-test/194cdbd0-df8b-43e0-843a-50fdfc3f887d/usuario/${codigoReferido}`)
+      fetch(`/api/usuario?codigo=${codigoReferido}`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -225,7 +225,7 @@ const LandingContent = () => {
     setIsSubmitting(true);
 
     try {
-      const webhookURL = 'https://ppicaflor.app.n8n.cloud/webhook-test/registro';
+      const webhookURL = '/api/registro';
 
       const fechaRegistro = new Date().toISOString();
       const referidoPor = localStorage.getItem('referido_por') || null;

@@ -13,7 +13,7 @@ const PortalUsuario = () => {
     useEffect(() => {
         const fetchUsuario = async () => {
             try {
-                const response = await fetch(`https://ppicaflor.app.n8n.cloud/webhook-test/194cdbd0-df8b-43e0-843a-50fdfc3f887d/usuario/${codigo}`);
+                const response = await fetch(`/api/usuario?codigo=${codigo}`);
                 if (!response.ok) throw new Error('No se pudo obtener la información');
 
                 const data = await response.json();
