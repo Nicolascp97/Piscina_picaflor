@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, LogOut, Award, TrendingUp } from 'lucide-react';
 
 const PortalUsuario = () => {
-  const [usuario, setUsuario] = useState({
+  const [usuario] = useState({
     nombre: 'Usuario Demo',
     email: 'usuario@ejemplo.com',
     puntos: 450,

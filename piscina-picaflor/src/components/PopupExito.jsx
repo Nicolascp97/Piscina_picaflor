@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, Share2, Download, CheckCircle, X } from 'lucide-react';
+import { Copy, Share2, CheckCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const PopupExito = ({ datos, onClose }) => {
