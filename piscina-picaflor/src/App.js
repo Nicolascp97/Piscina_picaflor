@@ -264,8 +264,9 @@ const LandingContent = () => {
       }
 
     } catch (error) {
-      console.error('Error:', error);
-      alert(`Error: ${error.message}. Intenta nuevamente.`);
+      console.error('Error completo:', error);
+      console.error('Stack:', error.stack);
+      alert(`Error: ${error.message || 'Failed to fetch'}. Verifica que el webhook esté activo e intenta nuevamente.`);
     } finally {
       setIsSubmitting(false);
     }
