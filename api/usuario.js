@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://ppicaflor.app.n8n.cloud/webhook-test/194cdbd0-df8b-43e0-843a-50fdfc3f887d/usuario/${codigo}`
+      `https://ppicaflor.app.n8n.cloud/webhook/194cdbd0-df8b-43e0-843a-50fdfc3f887d/usuario/${codigo}`
     );
 
     const data = await response.json();

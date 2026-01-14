@@ -1,15 +1,100 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, Share2, CheckCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const PopupExito = ({ datos, onClose }) => {
     const [copiado, setCopiado] = useState('');
+    const [datosExtraidos, setDatosExtraidos] = useState(null);
     const navigate = useNavigate();
 
-    if (!datos) return null;
+    // Función para extraer código PICA-XXXX y puntos del string resultado
+    const extraerDatosDeRespuesta = (respuesta) => {
+        if (!respuesta) return null;
 
-    const { codigo, puntos, link_personal, link_referidos, nombre } = datos;
+        // Si la respuesta ya viene con la estructura correcta (resultado string)
+        const textoResultado = respuesta.resultado || respuesta;
+        
+        // Extraer código (formato PICA-XXXX o PICA-XXX)
+        const regexCodigo = /PICA-\d+/i;
+        const matchCodigo = textoResultado.match(regexCodigo);
+        const codigo = matchCodigo ? matchCodigo[0].toUpperCase() : null;
+
+        // Extraer puntos (buscar número seguido de "puntos" o "pts")
+        const regexPuntos = /(\d+)\s*(?:puntos|pts)/i;
+        const matchPuntos = textoResultado.match(regexPuntos);
+        const puntos = matchPuntos ? parseInt(matchPuntos[1]) : 20; // Default 20
+
+        // Extraer nombre si está en el texto
+        const regexNombre = /(?:bienvenid[oa]|hola),?\s+([A-Za-zÁÉÍÓÚáéíóúñÑ\s]+?)(?:[.,!]|\s+tu|$)/i;
+        const matchNombre = textoResultado.match(regexNombre);
+        let nombre = matchNombre ? matchNombre[1].trim() : null;
+        
+        // Si no se extrajo nombre del texto, buscar en propiedades del objeto
+        if (!nombre && respuesta.nombre) {
+            nombre = respuesta.nombre;
+        }
+        
+        // Si aún no hay nombre, buscar en formData guardado
+        if (!nombre) {
+            const formDataGuardado = localStorage.getItem('picaflor_temp_nombre');
+            nombre = formDataGuardado || 'Usuario';
+        }
+
+        return {
+            codigo,
+            puntos,
+            nombre,
+            textoCompleto: textoResultado
+        };
+    };
+
+    useEffect(() => {
+        if (!datos) return;
+
+        console.log('Datos recibidos en PopupExito:', datos);
+        const datosProcessados = extraerDatosDeRespuesta(datos);
+        console.log('Datos extraídos:', datosProcessados);
+        
+        if (datosProcessados && datosProcessados.codigo) {
+            // Guardar en localStorage para persistencia
+            const datosUsuario = {
+                nombre: datosProcessados.nombre,
+                codigo: datosProcessados.codigo,
+                puntos: datosProcessados.puntos,
+                fechaRegistro: new Date().toISOString()
+            };
+            
+            localStorage.setItem('picaflor_user', JSON.stringify(datosUsuario));
+            localStorage.setItem('picaflor_codigo', datosProcessados.codigo);
+            
+            setDatosExtraidos(datosProcessados);
+        } else {
+            console.warn('No se pudo extraer el código de la respuesta');
+            // Fallback: intentar usar datos directos si vienen en otra estructura
+            if (datos.codigo && datos.puntos) {
+                setDatosExtraidos(datos);
+            }
+        }
+    }, [datos]);
+
+    if (!datos) return null;
+    
+    // Mostrar loading mientras se procesan los datos
+    if (!datosExtraidos) {
+        return (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={onClose} />
+                <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md relative z-10 p-8 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Procesando tu registro...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const { codigo, puntos, nombre } = datosExtraidos;
+    const link_referidos = `https://piscina-picaflor.vercel.app/r/${codigo}`;
 
     const handleCopiar = (texto, tipo) => {
         navigator.clipboard.writeText(texto);
@@ -18,8 +103,8 @@ const PopupExito = ({ datos, onClose }) => {
     };
 
     const compartirWhatsApp = () => {
-        const texto = `¡Hola! Acabo de registrarme en Piscina Picaflor. Regístrate tú también con mi link y gana 50 puntos extra: ${link_referidos}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+        const mensaje = `¡Hola! Inscríbete en el Club Picaflor usando mi código de referido: ${codigo} y suma puntos para tu próxima visita. Regístrate aquí: ${link_referidos}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
     };
 
     const irAlPortal = () => {
@@ -70,7 +155,7 @@ const PopupExito = ({ datos, onClose }) => {
                     <div className="flex flex-col items-center justify-center bg-gray-50 rounded-2xl p-6 border-2 border-dashed border-gray-200">
                         <QRCodeSVG
                             id="qr-code-registro"
-                            value={link_personal}
+                            value={codigo}
                             size={150}
                             level="H"
                             includeMargin={true}

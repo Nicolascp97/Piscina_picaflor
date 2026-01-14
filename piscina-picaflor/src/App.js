@@ -230,6 +230,9 @@ const LandingContent = () => {
       const fechaRegistro = new Date().toISOString();
       const referidoPor = localStorage.getItem('referido_por') || null;
 
+      // Guardar temporalmente el nombre para el PopupExito
+      localStorage.setItem('picaflor_temp_nombre', formData.nombre);
+
       const datos = {
         nombre: formData.nombre,
         email: formData.email,
@@ -255,10 +258,18 @@ const LandingContent = () => {
       console.log('Respuesta:', result);
 
       if (result.success) {
-        setSuccessData(result.data);
+        // Agregar el nombre al objeto de respuesta si no viene incluido
+        const datosConNombre = {
+          ...result.data,
+          nombre: formData.nombre
+        };
+        setSuccessData(datosConNombre);
         setShowCardModal(false);
         setShowSuccessPopup(true);
         setFormData({ nombre: '', celular: '', email: '' });
+        
+        // Limpiar el nombre temporal después de usarlo
+        localStorage.removeItem('picaflor_temp_nombre');
       } else {
         throw new Error(result.message || 'Error desconocido');
       }

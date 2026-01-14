@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook-test/registro', {
+    const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook/registro', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,0 +1,16 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/registro",
+            "destination": "https://ppicaflor.app.n8n.cloud/webhook/registro"
+        },
+        {
+            "source": "/api/usuario",
+            "destination": "https://ppicaflor.app.n8n.cloud/webhook/usuario"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
+}
