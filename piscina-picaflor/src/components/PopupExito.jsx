@@ -1,104 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, Share2, CheckCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const PopupExito = ({ datos, onClose }) => {
     const [copiado, setCopiado] = useState('');
-    const [datosExtraidos, setDatosExtraidos] = useState(null);
     const navigate = useNavigate();
 
-    // Función para extraer código PICA-XXXX y puntos del string resultado
-    const extraerDatosDeRespuesta = (respuesta) => {
-        if (!respuesta) return null;
+    if (!datos) return null;
 
-        // Si la respuesta ya viene con la estructura correcta (resultado string)
-        const textoResultado = respuesta.resultado || respuesta;
-        
-        // Extraer código (formato PICA-XXXX o PICA-XXX)
-        const regexCodigo = /PICA-\d+/i;
-        const matchCodigo = textoResultado.match(regexCodigo);
-        const codigo = matchCodigo ? matchCodigo[0].toUpperCase() : null;
+    // Extraer datos directamente de la respuesta del servidor
+    const codigo = datos.codigo || null;
+    const puntos = datos.puntos || 20;
+    const nombre = datos.nombre || localStorage.getItem('picaflor_temp_nombre') || 'Usuario';
 
-        // Extraer puntos (buscar número seguido de "puntos" o "pts")
-        const regexPuntos = /(\d+)\s*(?:puntos|pts)/i;
-        const matchPuntos = textoResultado.match(regexPuntos);
-        const puntos = matchPuntos ? parseInt(matchPuntos[1]) : 20; // Default 20
-
-        // Extraer nombre si está en el texto
-        const regexNombre = /(?:bienvenid[oa]|hola),?\s+([A-Za-zÁÉÍÓÚáéíóúñÑ\s]+?)(?:[.,!]|\s+tu|$)/i;
-        const matchNombre = textoResultado.match(regexNombre);
-        let nombre = matchNombre ? matchNombre[1].trim() : null;
-        
-        // Si no se extrajo nombre del texto, buscar en propiedades del objeto
-        if (!nombre && respuesta.nombre) {
-            nombre = respuesta.nombre;
-        }
-        
-        // Si aún no hay nombre, buscar en formData guardado
-        if (!nombre) {
-            const formDataGuardado = localStorage.getItem('picaflor_temp_nombre');
-            nombre = formDataGuardado || 'Usuario';
-        }
-
-        return {
+    // Guardar en localStorage para persistencia
+    if (codigo) {
+        const datosUsuario = {
+            nombre,
             codigo,
             puntos,
-            nombre,
-            textoCompleto: textoResultado
+            fechaRegistro: new Date().toISOString()
         };
-    };
-
-    useEffect(() => {
-        if (!datos) return;
-
-        console.log('Datos recibidos en PopupExito:', datos);
-        const datosProcessados = extraerDatosDeRespuesta(datos);
-        console.log('Datos extraídos:', datosProcessados);
-        
-        if (datosProcessados && datosProcessados.codigo) {
-            // Guardar en localStorage para persistencia
-            const datosUsuario = {
-                nombre: datosProcessados.nombre,
-                codigo: datosProcessados.codigo,
-                puntos: datosProcessados.puntos,
-                fechaRegistro: new Date().toISOString()
-            };
-            
-            localStorage.setItem('picaflor_user', JSON.stringify(datosUsuario));
-            localStorage.setItem('picaflor_codigo', datosProcessados.codigo);
-            
-            setDatosExtraidos(datosProcessados);
-        } else {
-            console.warn('No se pudo extraer el código de la respuesta');
-            // Fallback: intentar usar datos directos si vienen en otra estructura
-            if (datos.codigo && datos.puntos) {
-                setDatosExtraidos(datos);
-            }
-        }
-    }, [datos]);
-
-    if (!datos) return null;
-    
-    // Mostrar loading mientras se procesan los datos
-    if (!datosExtraidos) {
-        return (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={onClose} />
-                <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md relative z-10 p-8 text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Procesando tu registro...</p>
-                </div>
-            </div>
-        );
+        localStorage.setItem('picaflor_user', JSON.stringify(datosUsuario));
+        localStorage.setItem('picaflor_codigo', codigo);
+        console.log('Datos guardados en localStorage:', datosUsuario);
     }
 
-    const { codigo, puntos, nombre } = datosExtraidos;
     const link_referidos = `https://piscina-picaflor.vercel.app/r/${codigo}`;
 
-    const handleCopiar = (texto, tipo) => {
-        navigator.clipboard.writeText(texto);
-        setCopiado(tipo);
+    const handleCopiarCodigo = () => {
+        navigator.clipboard.writeText(codigo);
+        setCopiado('codigo');
+        setTimeout(() => setCopiado(''), 2000);
+    };
+
+    const handleCopiarLink = () => {
+        navigator.clipboard.writeText(link_referidos);
+        setCopiado('link');
         setTimeout(() => setCopiado(''), 2000);
     };
 
@@ -141,13 +80,20 @@ const PopupExito = ({ datos, onClose }) => {
                 <div className="p-6 space-y-6">
                     {/* Código y Puntos */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-cyan-50 rounded-2xl p-4 text-center border-2 border-cyan-100">
+                        <div className="bg-cyan-50 rounded-2xl p-4 text-center border-2 border-cyan-100 relative">
                             <p className="text-cyan-600 text-xs font-bold uppercase tracking-wider mb-1">Tu Código</p>
-                            <p className="text-2xl font-black text-gray-800">{codigo}</p>
+                            <p id="tu-codigo" className="text-2xl font-black text-gray-800">{codigo}</p>
+                            <button
+                                onClick={handleCopiarCodigo}
+                                className="absolute top-2 right-2 p-1.5 bg-white hover:bg-cyan-50 rounded-lg transition-colors"
+                                title="Copiar código"
+                            >
+                                {copiado === 'codigo' ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-cyan-600" />}
+                            </button>
                         </div>
                         <div className="bg-emerald-50 rounded-2xl p-4 text-center border-2 border-emerald-100">
                             <p className="text-emerald-600 text-xs font-bold uppercase tracking-wider mb-1">Tus Puntos</p>
-                            <p className="text-2xl font-black text-gray-800">{puntos}</p>
+                            <p id="tus-puntos" className="text-2xl font-black text-gray-800">{puntos}</p>
                         </div>
                     </div>
 
@@ -181,7 +127,7 @@ const PopupExito = ({ datos, onClose }) => {
                                 className="w-full bg-gray-100 text-gray-600 px-4 py-3 rounded-xl text-sm outline-none border border-transparent focus:border-cyan-500 transition-colors"
                             />
                             <button
-                                onClick={() => handleCopiar(link_referidos, 'link')}
+                                onClick={handleCopiarLink}
                                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-white shadow-sm rounded-lg hover:bg-gray-50 text-gray-600 transition-colors"
                                 title="Copiar link"
                             >

@@ -1,5 +1,11 @@
 {
   "buildCommand": "npm --prefix piscina-picaflor run build",
   "outputDirectory": "piscina-picaflor/build",
-  "installCommand": "npm config set legacy-peer-deps true && npm install && npm --prefix piscina-picaflor install"
+  "installCommand": "npm config set legacy-peer-deps true && npm install && npm --prefix piscina-picaflor install",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
