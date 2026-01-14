@@ -4,6 +4,14 @@
   "installCommand": "npm config set legacy-peer-deps true && npm install && npm --prefix piscina-picaflor install",
   "rewrites": [
     {
+      "source": "/api/registro",
+      "destination": "https://ppicaflor.app.n8n.cloud/webhook-test/registro"
+    },
+    {
+      "source": "/api/usuario",
+      "destination": "https://ppicaflor.app.n8n.cloud/webhook-test/usuario"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
