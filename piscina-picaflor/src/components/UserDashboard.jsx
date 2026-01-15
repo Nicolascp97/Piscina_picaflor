@@ -25,101 +25,105 @@ const UserDashboard = () => {
         puntos: 0,
         nivel: 'Bronce',
         proximaRecompensa: 500,
-        historial: []
+        historial: [],
+        premios: [],
+        referidos: []
     });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const cargarDatosUsuario = () => {
-            try {
-                // Mock data completo y realista
-                const mockUser = {
-                    codigo: code || 'PICA-1234',
-                    nombre: 'María González',
-                    email: 'maria@ejemplo.com',
-                    puntos: 420,
-                    nivel: 'VIP',
-                    proximaRecompensa: 500,
-                    historial: [
-                        {
-                            fecha: '2026-01-13',
-                            actividad: 'Visita a piscina',
-                            puntos: 50,
-                            tipo: 'entrada'
-                        },
-                        {
-                            fecha: '2026-01-10',
-                            actividad: 'Amigo referido: Juan P.',
-                            puntos: 100,
-                            tipo: 'referido'
-                        },
-                        {
-                            fecha: '2026-01-08',
-                            actividad: 'Visita a piscina',
-                            puntos: 50,
-                            tipo: 'entrada'
-                        },
-                        {
-                            fecha: '2026-01-05',
-                            actividad: 'Bonus de bienvenida',
-                            puntos: 150,
-                            tipo: 'bonus'
-                        },
-                        {
-                            fecha: '2026-01-03',
-                            actividad: 'Registro completado',
-                            puntos: 50,
-                            tipo: 'registro'
-                        }
-                    ]
-                };
+        const cargarDatosUsuario = async () => {
+            if (!code) {
+                console.error('No hay código de usuario');
+                setLoading(false);
+                navigate('/');
+                return;
+            }
 
-                // Recuperar de localStorage si existe
-                const cached = localStorage.getItem('picaflor_user');
+            try {
+                console.log('Consultando datos del usuario:', code);
                 
+                // Fetch real a la API de n8n
+                const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook-test/info-socio', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        codigo: code
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Respuesta de la API:', data);
+
+                if (data.success && data.data) {
+                    // Actualizar usuario con los datos reales de la API
+                    const userData = {
+                        codigo: code,
+                        nombre: data.data.nombre || 'Usuario',
+                        email: data.data.email || '',
+                        puntos: data.data.puntos || 0,
+                        nivel: data.data.nivel || 'Bronce',
+                        proximaRecompensa: data.data.proximaRecompensa || 500,
+                        historial: Array.isArray(data.data.historial) ? data.data.historial : [],
+                        premios: Array.isArray(data.data.premios) ? data.data.premios : [],
+                        referidos: Array.isArray(data.data.referidos) ? data.data.referidos : []
+                    };
+
+                    setUsuario(userData);
+
+                    // Guardar en localStorage para cache
+                    localStorage.setItem('picaflor_user', JSON.stringify(userData));
+                    localStorage.setItem('picaflor_codigo', code);
+                    
+                    console.log('Usuario actualizado correctamente:', userData);
+                } else {
+                    // Usuario no encontrado
+                    console.error('Usuario no encontrado o respuesta inválida');
+                    alert('Usuario no encontrado. Serás redirigido al inicio.');
+                    navigate('/');
+                }
+            } catch (error) {
+                console.error('Error al cargar datos del usuario:', error);
+                
+                // Intentar cargar desde localStorage como fallback
+                const cached = localStorage.getItem('picaflor_user');
                 if (cached) {
                     try {
                         const cachedUser = JSON.parse(cached);
-                        
-                        // Asegurar que historial siempre sea un array
-                        if (!Array.isArray(cachedUser.historial)) {
-                            cachedUser.historial = mockUser.historial;
-                        }
-                        
-                        // Si el código coincide, usar datos del cache, sino usar mock
                         if (cachedUser.codigo === code) {
+                            console.log('Usando datos de caché');
                             setUsuario({
-                                ...mockUser,
                                 ...cachedUser,
-                                historial: cachedUser.historial || mockUser.historial
+                                historial: Array.isArray(cachedUser.historial) ? cachedUser.historial : [],
+                                premios: Array.isArray(cachedUser.premios) ? cachedUser.premios : []
                             });
                         } else {
-                            setUsuario(mockUser);
+                            alert('No se pudo conectar con el servidor. Por favor, intenta más tarde.');
+                            navigate('/');
                         }
                     } catch (parseError) {
                         console.error('Error parseando localStorage:', parseError);
-                        setUsuario(mockUser);
+                        alert('Error al cargar los datos. Serás redirigido al inicio.');
+                        navigate('/');
                     }
                 } else {
-                    // Si no hay cache, usar mock data
-                    setUsuario(mockUser);
+                    // No hay cache, redirigir al home
+                    alert('No se pudo conectar con el servidor. Por favor, intenta más tarde.');
+                    navigate('/');
                 }
-            } catch (error) {
-                console.error('Error cargando usuario:', error);
-                // En caso de error, asegurar que hay datos mínimos
-                setUsuario(prev => ({
-                    ...prev,
-                    codigo: code || 'PICA-0000',
-                    historial: []
-                }));
             } finally {
                 setLoading(false);
             }
         };
 
-        // Pequeño delay para simular carga
-        setTimeout(cargarDatosUsuario, 300);
-    }, [code]);
+        cargarDatosUsuario();
+    }, [code, navigate]);
 
     const handleLogout = () => {
         localStorage.removeItem('picaflor_user');
@@ -345,6 +349,51 @@ const UserDashboard = () => {
                         )}
                     </div>
                 </div>
+
+                {/* Premios/Canjes */}
+                {usuario?.premios && usuario.premios.length > 0 && (
+                    <div className="bg-white rounded-3xl shadow-lg p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <Gift className="w-6 h-6 text-purple-500" />
+                                Mis Canjes
+                            </h2>
+                        </div>
+
+                        <div className="space-y-3">
+                            {usuario.premios.map((premio, idx) => (
+                                <div 
+                                    key={idx} 
+                                    className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100"
+                                >
+                                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-md">
+                                        <Gift className="w-6 h-6" />
+                                    </div>
+                                    
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-gray-800 text-sm">
+                                            {premio?.nombre || premio?.descripcion || 'Premio'}
+                                        </p>
+                                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+                                            <Calendar className="w-3 h-3" />
+                                            {premio?.fecha ? new Date(premio.fecha).toLocaleDateString('es-ES', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric'
+                                            }) : 'Fecha no disponible'}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex-shrink-0 text-right">
+                                        <span className="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-semibold">
+                                            {premio?.estado || 'Canjeado'}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Footer Info */}
                 <div className="text-center py-4">
