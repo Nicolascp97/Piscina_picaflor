@@ -59,9 +59,9 @@ const PopupExito = ({ datos, onClose }) => {
             />
 
             {/* Modal */}
-            <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md relative z-10 overflow-hidden animate-scale-in">
+            <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md max-h-[90vh] relative z-10 overflow-hidden animate-scale-in flex flex-col">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 p-8 text-center text-white relative">
+                <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 p-5 text-center text-white relative flex-shrink-0">
                     <button
                         onClick={onClose}
                         className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 rounded-full p-1 transition-colors"
@@ -69,20 +69,20 @@ const PopupExito = ({ datos, onClose }) => {
                         <X className="w-6 h-6" />
                     </button>
 
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-500 shadow-lg animate-bounce">
-                        <CheckCircle className="w-10 h-10" />
+                    <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mx-auto mb-3 text-emerald-500 shadow-lg animate-bounce">
+                        <CheckCircle className="w-8 h-8" />
                     </div>
-                    <h2 className="text-2xl font-bold mb-2">¡Bienvenido/a {nombre}!</h2>
+                    <h2 className="text-xl font-bold mb-1">¡Bienvenido/a {nombre}!</h2>
                     <p className="opacity-90">Tu registro fue exitoso</p>
                 </div>
 
                 {/* Content */}
-                <div className="p-6 space-y-6">
+                <div className="p-4 space-y-4 overflow-y-auto flex-1">
                     {/* Código y Puntos */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-cyan-50 rounded-2xl p-4 text-center border-2 border-cyan-100 relative">
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-cyan-50 rounded-xl p-3 text-center border-2 border-cyan-100 relative">
                             <p className="text-cyan-600 text-xs font-bold uppercase tracking-wider mb-1">Tu Código</p>
-                            <p id="tu-codigo" className="text-2xl font-black text-gray-800">{codigo}</p>
+                            <p id="tu-codigo" className="text-xl font-black text-gray-800">{codigo}</p>
                             <button
                                 onClick={handleCopiarCodigo}
                                 className="absolute top-2 right-2 p-1.5 bg-white hover:bg-cyan-50 rounded-lg transition-colors"
@@ -91,23 +91,23 @@ const PopupExito = ({ datos, onClose }) => {
                                 {copiado === 'codigo' ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-cyan-600" />}
                             </button>
                         </div>
-                        <div className="bg-emerald-50 rounded-2xl p-4 text-center border-2 border-emerald-100">
+                        <div className="bg-emerald-50 rounded-xl p-3 text-center border-2 border-emerald-100">
                             <p className="text-emerald-600 text-xs font-bold uppercase tracking-wider mb-1">Tus Puntos</p>
-                            <p id="tus-puntos" className="text-2xl font-black text-gray-800">{puntos}</p>
+                            <p id="tus-puntos" className="text-xl font-black text-gray-800">{puntos}</p>
                         </div>
                     </div>
 
                     {/* QR Code */}
-                    <div className="flex flex-col items-center justify-center bg-gray-50 rounded-2xl p-6 border-2 border-dashed border-gray-200">
+                    <div className="flex flex-col items-center justify-center bg-gray-50 rounded-xl p-4 border-2 border-dashed border-gray-200">
                         <QRCodeSVG
                             id="qr-code-registro"
                             value={codigo}
-                            size={150}
+                            size={120}
                             level="H"
                             includeMargin={true}
-                            className="mb-4 shadow-sm rounded-lg"
+                            className="mb-2 shadow-sm rounded-lg"
                         />
-                        <p className="text-sm text-gray-500 text-center mb-4">
+                        <p className="text-sm text-gray-500 text-center mb-2">
                             Muestra este código en la entrada<br />para sumar puntos
                         </p>
                         <button
@@ -137,7 +137,7 @@ const PopupExito = ({ datos, onClose }) => {
 
                         <button
                             onClick={compartirWhatsApp}
-                            className="w-full bg-[#25D366] hover:bg-[#1fae56] text-white py-3.5 rounded-xl font-bold font-sans shadow-lg shadow-green-200 hover:shadow-green-300 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                            className="w-full bg-[#25D366] hover:bg-[#1fae56] text-white py-3 rounded-xl font-bold font-sans shadow-lg shadow-green-200 hover:shadow-green-300 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
                         >
                             <Share2 className="w-5 h-5" />
                             Invitar amigos (+50 pts)
