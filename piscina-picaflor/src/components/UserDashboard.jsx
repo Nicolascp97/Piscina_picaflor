@@ -16,17 +16,23 @@ import {
 const UserDashboard = () => {
     const { code } = useParams();
     const navigate = useNavigate();
-    const [usuario, setUsuario] = useState(null);
+    
+    // Inicialización segura con valores por defecto
+    const [usuario, setUsuario] = useState({
+        codigo: code || 'PICA-0000',
+        nombre: 'Usuario',
+        email: '',
+        puntos: 0,
+        nivel: 'Bronce',
+        proximaRecompensa: 500,
+        historial: []
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Simular carga de datos del usuario
-        const fetchUsuario = async () => {
+        const cargarDatosUsuario = () => {
             try {
-                // En producción, esto sería una llamada a la API
-                // const response = await fetch(`/api/usuario?codigo=${code}`);
-                
-                // Mock data para demostración
+                // Mock data completo y realista
                 const mockUser = {
                     codigo: code || 'PICA-1234',
                     nombre: 'María González',
@@ -70,28 +76,49 @@ const UserDashboard = () => {
 
                 // Recuperar de localStorage si existe
                 const cached = localStorage.getItem('picaflor_user');
+                
                 if (cached) {
-                    const cachedUser = JSON.parse(cached);
-                    if (cachedUser.codigo === code) {
-                        setUsuario(cachedUser);
-                    } else {
+                    try {
+                        const cachedUser = JSON.parse(cached);
+                        
+                        // Asegurar que historial siempre sea un array
+                        if (!Array.isArray(cachedUser.historial)) {
+                            cachedUser.historial = mockUser.historial;
+                        }
+                        
+                        // Si el código coincide, usar datos del cache, sino usar mock
+                        if (cachedUser.codigo === code) {
+                            setUsuario({
+                                ...mockUser,
+                                ...cachedUser,
+                                historial: cachedUser.historial || mockUser.historial
+                            });
+                        } else {
+                            setUsuario(mockUser);
+                        }
+                    } catch (parseError) {
+                        console.error('Error parseando localStorage:', parseError);
                         setUsuario(mockUser);
                     }
                 } else {
+                    // Si no hay cache, usar mock data
                     setUsuario(mockUser);
                 }
             } catch (error) {
                 console.error('Error cargando usuario:', error);
+                // En caso de error, asegurar que hay datos mínimos
+                setUsuario(prev => ({
+                    ...prev,
+                    codigo: code || 'PICA-0000',
+                    historial: []
+                }));
             } finally {
                 setLoading(false);
             }
         };
 
-        if (code) {
-            fetchUsuario();
-        } else {
-            setLoading(false);
-        }
+        // Pequeño delay para simular carga
+        setTimeout(cargarDatosUsuario, 300);
     }, [code]);
 
     const handleLogout = () => {
@@ -104,7 +131,7 @@ const UserDashboard = () => {
     };
 
     const handleInviteFriends = () => {
-        const link = `https://piscina-picaflor.vercel.app/r/${usuario.codigo}`;
+        const link = `https://piscina-picaflor.vercel.app/r/${usuario?.codigo || 'PICA-0000'}`;
         const texto = `¡Hola! 🏊‍♀️ Te invito a Piscina Picaflor. Regístrate con mi código y gana puntos extra: ${link}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
     };
@@ -114,20 +141,22 @@ const UserDashboard = () => {
             <div className="min-h-screen bg-gradient-to-br from-teal-50 to-white flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-16 w-16 border-4 border-teal-500 border-t-transparent mx-auto mb-4"></div>
-                    <p className="text-teal-600 font-medium">Cargando tu dashboard...</p>
+                    <p className="text-teal-600 font-medium text-lg">Cargando tu perfil...</p>
+                    <p className="text-gray-400 text-sm mt-2">Un momento por favor</p>
                 </div>
             </div>
         );
     }
 
-    if (!usuario) {
+    // Validación adicional de seguridad
+    if (!usuario || !usuario.codigo) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-teal-50 to-white flex items-center justify-center p-4">
                 <div className="text-center">
-                    <p className="text-red-500 mb-4">Usuario no encontrado</p>
+                    <p className="text-red-500 mb-4 text-lg font-semibold">No se pudo cargar el perfil</p>
                     <button 
                         onClick={() => navigate('/')}
-                        className="text-teal-600 hover:underline font-medium"
+                        className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-xl font-medium transition-colors"
                     >
                         Volver al inicio
                     </button>
@@ -136,8 +165,8 @@ const UserDashboard = () => {
         );
     }
 
-    const puntosParaRecompensa = usuario.proximaRecompensa - usuario.puntos;
-    const progresoRecompensa = (usuario.puntos / usuario.proximaRecompensa) * 100;
+    const puntosParaRecompensa = Math.max(0, (usuario.proximaRecompensa || 500) - (usuario.puntos || 0));
+    const progresoRecompensa = Math.min(100, ((usuario.puntos || 0) / (usuario.proximaRecompensa || 500)) * 100);
 
     const getIconoActividad = (tipo) => {
         switch(tipo) {
@@ -156,7 +185,7 @@ const UserDashboard = () => {
                 <div className="max-w-md mx-auto flex items-center justify-between">
                     <div>
                         <p className="text-teal-50 text-sm font-medium">¡Hola!</p>
-                        <h1 className="text-white text-2xl font-bold">{usuario.nombre}</h1>
+                        <h1 className="text-white text-2xl font-bold">{usuario?.nombre || 'Usuario'}</h1>
                     </div>
                     <button 
                         onClick={handleLogout}
@@ -179,7 +208,7 @@ const UserDashboard = () => {
                         <div className="relative z-10">
                             <div className="bg-white p-6 rounded-2xl inline-block shadow-2xl mb-4">
                                 <QRCodeSVG
-                                    value={`https://piscina-picaflor.vercel.app/dashboard/${usuario.codigo}`}
+                                    value={`https://piscina-picaflor.vercel.app/dashboard/${usuario?.codigo || 'PICA-0000'}`}
                                     size={180}
                                     level="H"
                                     includeMargin={false}
@@ -190,7 +219,7 @@ const UserDashboard = () => {
                             <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-xl inline-block">
                                 <p className="text-teal-50 text-xs font-medium mb-1">Tu código</p>
                                 <p className="text-white text-3xl font-black tracking-wider font-mono">
-                                    {usuario.codigo}
+                                    {usuario?.codigo || 'PICA-0000'}
                                 </p>
                             </div>
                         </div>
@@ -205,10 +234,10 @@ const UserDashboard = () => {
                             <div className="flex items-center justify-center gap-2">
                                 <Trophy className="w-8 h-8 text-amber-500" />
                                 <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00d1b2] to-[#00b89c]">
-                                    {usuario.puntos}
+                                    {usuario?.puntos || 0}
                                 </span>
                             </div>
-                            <p className="text-gray-400 text-xs mt-2">Nivel {usuario.nivel}</p>
+                            <p className="text-gray-400 text-xs mt-2">Nivel {usuario?.nivel || 'Bronce'}</p>
                         </div>
 
                         {/* Barra de Progreso */}
@@ -233,7 +262,7 @@ const UserDashboard = () => {
                             </div>
                             
                             <p className="text-center text-xs text-amber-700 font-medium mt-2">
-                                🎁 Entrada Gratis en {usuario.proximaRecompensa} puntos
+                                🎁 Entrada Gratis en {usuario?.proximaRecompensa || 500} puntos
                             </p>
                         </div>
                     </div>
@@ -276,36 +305,44 @@ const UserDashboard = () => {
                     </div>
 
                     <div className="space-y-1">
-                        {usuario.historial.map((item, idx) => (
-                            <div 
-                                key={idx} 
-                                className="flex items-center gap-4 p-4 hover:bg-teal-50 rounded-xl transition-colors group"
-                            >
-                                <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-[#00d1b2] to-[#00b89c] rounded-xl flex items-center justify-center text-white shadow-md">
-                                    {getIconoActividad(item.tipo)}
-                                </div>
-                                
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-semibold text-gray-800 text-sm truncate">
-                                        {item.actividad}
-                                    </p>
-                                    <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
-                                        <Calendar className="w-3 h-3" />
-                                        {new Date(item.fecha).toLocaleDateString('es-ES', {
-                                            day: 'numeric',
-                                            month: 'short'
-                                        })}
+                        {(usuario?.historial && Array.isArray(usuario.historial) && usuario.historial.length > 0) ? (
+                            usuario.historial.map((item, idx) => (
+                                <div 
+                                    key={idx} 
+                                    className="flex items-center gap-4 p-4 hover:bg-teal-50 rounded-xl transition-colors group"
+                                >
+                                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-[#00d1b2] to-[#00b89c] rounded-xl flex items-center justify-center text-white shadow-md">
+                                        {getIconoActividad(item?.tipo)}
+                                    </div>
+                                    
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-gray-800 text-sm truncate">
+                                            {item?.actividad || 'Actividad'}
+                                        </p>
+                                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+                                            <Calendar className="w-3 h-3" />
+                                            {item?.fecha ? new Date(item.fecha).toLocaleDateString('es-ES', {
+                                                day: 'numeric',
+                                                month: 'short'
+                                            }) : 'Fecha desconocida'}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex-shrink-0 text-right">
+                                        <span className="font-black text-lg text-[#00b89c]">
+                                            +{item?.puntos || 0}
+                                        </span>
+                                        <p className="text-xs text-gray-400">pts</p>
                                     </div>
                                 </div>
-
-                                <div className="flex-shrink-0 text-right">
-                                    <span className="font-black text-lg text-[#00b89c]">
-                                        +{item.puntos}
-                                    </span>
-                                    <p className="text-xs text-gray-400">pts</p>
-                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-8">
+                                <p className="text-gray-400 text-sm">
+                                    Aún no tienes actividad registrada
+                                </p>
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
 
