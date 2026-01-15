@@ -226,7 +226,7 @@ const LandingContent = () => {
     setIsSubmitting(true);
 
     try {
-      const webhookURL = '/api/registro';
+      const webhookURL = 'https://ppicaflor.app.n8n.cloud/webhook/registro';
 
       const fechaRegistro = new Date().toISOString();
       const referidoPor = localStorage.getItem('referido_por') || null;

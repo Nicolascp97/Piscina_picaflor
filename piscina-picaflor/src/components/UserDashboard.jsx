@@ -43,8 +43,8 @@ const UserDashboard = () => {
             try {
                 console.log('Consultando datos del usuario:', code);
                 
-                // Fetch real a la API de n8n
-                const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook-test/info-socio', {
+                // Fetch real a la API de n8n (producción)
+                const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook/info-socio', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
