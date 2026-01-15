@@ -31,7 +31,7 @@ https://piscinapicaflor.cl/#/u/{{codigo}}
 
 **AHORA (correcto):**
 ```
-https://piscinapicaflor.cl/#/dashboard/{{codigo}}
+https://www.piscinapicaflor.cl/#/dashboard/{{codigo}}
 ```
 
 ---
