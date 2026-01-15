@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, Share2, Award, History, Users, ChevronLeft, Calendar, LogOut } from 'lucide-react';
+import { Copy, Share2, Award, History, Users, ChevronLeft, Calendar } from 'lucide-react';
 
 const PortalUsuario = () => {
     const { codigo } = useParams();

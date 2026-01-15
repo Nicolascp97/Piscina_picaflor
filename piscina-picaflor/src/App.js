@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Droplet, Gift, Heart, Sparkles, CheckCircle, QrCode, ChevronLeft, ChevronRight, Play, MessageCircle, X } from 'lucide-react';
 import { HashRouter, Routes, Route, useParams } from 'react-router-dom';
 import PortalUsuario from './components/PortalUsuario';
+import UserDashboard from './components/UserDashboard';
 import BannerReferido from './components/BannerReferido';
 import PopupExito from './components/PopupExito';
 
@@ -740,6 +741,7 @@ const PiscinaPicaflorApp = () => {
         <Route path="/" element={<LandingContent />} />
         <Route path="/r/:codigoReferido" element={<LandingContent />} />
         <Route path="/u/:codigo" element={<PortalUsuario />} />
+        <Route path="/dashboard/:code" element={<UserDashboard />} />
         {/* Fallback route */}
         <Route path="*" element={<LandingContent />} />
       </Routes>

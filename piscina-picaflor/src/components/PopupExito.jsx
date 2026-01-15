@@ -35,19 +35,9 @@ const PopupExito = ({ datos, onClose }) => {
         setTimeout(() => setCopiado(''), 2000);
     };
 
-    const handleCopiarLink = () => {
-        navigator.clipboard.writeText(link_referidos);
-        setCopiado('link');
-        setTimeout(() => setCopiado(''), 2000);
-    };
-
     const compartirWhatsApp = () => {
         const mensaje = `¡Hola! Inscríbete en el Club Picaflor usando mi código de referido: ${codigo} y suma puntos para tu próxima visita. Regístrate aquí: ${link_referidos}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(mensaje)}`, '_blank');
-    };
-
-    const irAlPortal = () => {
-        navigate(`/u/${codigo}`);
     };
 
     return (
@@ -72,12 +62,12 @@ const PopupExito = ({ datos, onClose }) => {
                     <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mx-auto mb-3 text-emerald-500 shadow-lg animate-bounce">
                         <CheckCircle className="w-8 h-8" />
                     </div>
-                    <h2 className="text-xl font-bold mb-1">¡Bienvenido/a {nombre}!</h2>
-                    <p className="opacity-90">Tu registro fue exitoso</p>
+                    <h2 className="text-2xl font-bold mb-2">¡Ya eres VIP!</h2>
+                    <p className="opacity-90 text-sm">Hemos enviado tu Tarjeta Digital a tu correo.<br />Mientras tanto, usa este código temporal:</p>
                 </div>
 
                 {/* Content */}
-                <div className="p-4 space-y-4 overflow-y-auto flex-1">
+                <div className="p-5 space-y-4 overflow-y-auto flex-1">
                     {/* Código y Puntos */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-cyan-50 rounded-xl p-3 text-center border-2 border-cyan-100 relative">
@@ -102,47 +92,39 @@ const PopupExito = ({ datos, onClose }) => {
                         <QRCodeSVG
                             id="qr-code-registro"
                             value={codigo}
-                            size={120}
+                            size={140}
                             level="H"
                             includeMargin={true}
-                            className="mb-2 shadow-sm rounded-lg"
+                            className="mb-3 shadow-sm rounded-lg"
                         />
-                        <p className="text-sm text-gray-500 text-center mb-2">
+                        <p className="text-sm text-gray-500 text-center">
                             Muestra este código en la entrada<br />para sumar puntos
                         </p>
-                        <button
-                            onClick={irAlPortal}
-                            className="text-cyan-600 font-semibold text-sm hover:underline"
-                        >
-                            Ir a mi portal personal →
-                        </button>
                     </div>
+                </div>
 
-                    {/* Links y Acciones */}
-                    <div className="space-y-3">
-                        <div className="relative">
-                            <input
-                                readOnly
-                                value={link_referidos}
-                                className="w-full bg-gray-100 text-gray-600 px-4 py-3 rounded-xl text-sm outline-none border border-transparent focus:border-cyan-500 transition-colors"
-                            />
-                            <button
-                                onClick={handleCopiarLink}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-white shadow-sm rounded-lg hover:bg-gray-50 text-gray-600 transition-colors"
-                                title="Copiar link"
-                            >
-                                {copiado === 'link' ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                            </button>
-                        </div>
+                {/* Footer con Botones de Acción */}
+                <div className="p-5 pt-0 space-y-3 flex-shrink-0">
+                    {/* Botón 1: Invitar a WhatsApp */}
+                    <button
+                        onClick={compartirWhatsApp}
+                        className="w-full bg-[#25D366] hover:bg-[#1fae56] text-white py-4 rounded-xl font-bold text-base shadow-lg shadow-green-200 hover:shadow-green-300 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                    >
+                        <Share2 className="w-5 h-5" />
+                        Invitar a un amigo en WhatsApp (+50 pts)
+                    </button>
 
-                        <button
-                            onClick={compartirWhatsApp}
-                            className="w-full bg-[#25D366] hover:bg-[#1fae56] text-white py-3 rounded-xl font-bold font-sans shadow-lg shadow-green-200 hover:shadow-green-300 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                        >
-                            <Share2 className="w-5 h-5" />
-                            Invitar amigos (+50 pts)
-                        </button>
-                    </div>
+                    {/* Botón 2: Ir al Dashboard */}
+                    <button
+                        onClick={() => {
+                            // Guardar código en localStorage antes de navegar
+                            localStorage.setItem('picaflor_current_user', codigo);
+                            navigate(`/dashboard/${codigo}`);
+                        }}
+                        className="w-full bg-white border-2 border-cyan-500 hover:bg-cyan-50 text-cyan-600 py-4 rounded-xl font-bold text-base transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                    >
+                        Ir a mi Dashboard
+                    </button>
                 </div>
             </div>
         </div>
