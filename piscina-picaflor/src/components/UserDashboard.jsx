@@ -40,70 +40,80 @@ const UserDashboard = () => {
                 return;
             }
 
+            console.log('=== INICIANDO CARGA DE DATOS ===');
+            console.log('Código del usuario:', code);
+            console.log('Dispositivo:', /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Móvil' : 'PC');
+            
             try {
-                console.log('=== INICIANDO CARGA DE DATOS ===');
-                console.log('Código del usuario:', code);
-                console.log('Dispositivo:', /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Móvil' : 'PC');
+                // PRIMERO intentar obtener datos reales de la API
+                console.log('📡 Consultando datos REALES del usuario desde API...');
+                const success = await fetchDatosDelAPI(code);
                 
-                // Intenta cargar desde localStorage primero (fallback offline)
+                if (success) {
+                    console.log('✅ Datos cargados exitosamente desde API');
+                    return;
+                }
+                
+                // Si la API falla, usar caché como fallback
+                console.log('🔍 API no disponible, intentando usar caché...');
                 const cached = localStorage.getItem('picaflor_user');
                 const cachedUser = cached ? JSON.parse(cached) : null;
                 
                 if (cachedUser && cachedUser.codigo === code) {
-                    console.log('✅ Datos encontrados en caché local');
+                    console.log('⚠️ Usando datos del caché (Sin conexión a servidor)');
                     setUsuario({
                         ...cachedUser,
                         historial: Array.isArray(cachedUser.historial) ? cachedUser.historial : [],
                         premios: Array.isArray(cachedUser.premios) ? cachedUser.premios : []
                     });
-                    setLoading(false);
-                    
-                    // Intenta actualizar desde la API en segundo plano
-                    console.log('📡 Intentando sincronizar con API...');
-                    fetchDatosEnSegundoPlano(code);
-                    return;
+                } else {
+                    console.error('❌ No hay datos disponibles (API + Caché)');
                 }
-                
-                // Si no hay caché, hacer fetch a la API
-                console.log('📡 Consultando datos del usuario desde API...');
-                await fetchDatosDelAPI(code);
                 
             } catch (error) {
                 console.error('❌ Error inesperado:', error);
+            } finally {
                 setLoading(false);
             }
         };
 
         const fetchDatosDelAPI = async (userCode) => {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout de 8 segundos
+
+                console.log('Iniciando fetch a API...');
                 const fetchOptions = {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ codigo: userCode }),
-                    mode: 'cors', // Explícito para móvil
-                    cache: 'no-cache'
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    signal: controller.signal
                 };
 
-                console.log('Enviando request a API...');
                 const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook-test/info-socio', fetchOptions);
+                clearTimeout(timeoutId);
 
-                console.log('Status HTTP:', response.status);
+                console.log('✅ Response recibida. Status:', response.status);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const data = await response.json();
-                console.log('✅ Respuesta de la API recibida:', data);
+                console.log('📦 JSON parseado:', data);
 
                 if (data.success && data.data) {
+                    console.log('✅ Datos válidos de API, actualizando estado...');
+                    
                     const userData = {
                         codigo: userCode,
                         nombre: data.data.nombre || 'Usuario',
                         email: data.data.email || '',
-                        puntos: data.data.puntos || 0,
+                        puntos: typeof data.data.puntos === 'number' ? data.data.puntos : 0,
                         nivel: data.data.nivel || 'Bronce',
                         proximaRecompensa: data.data.proximaRecompensa || 500,
                         historial: Array.isArray(data.data.historial) ? data.data.historial : [],
@@ -111,79 +121,29 @@ const UserDashboard = () => {
                         referidos: Array.isArray(data.data.referidos) ? data.data.referidos : []
                     };
 
+                    console.log('🎯 Datos a guardar:', userData);
+                    
+                    // Actualizar estado
                     setUsuario(userData);
+                    
+                    // Guardar en localStorage para caché
                     localStorage.setItem('picaflor_user', JSON.stringify(userData));
                     localStorage.setItem('picaflor_codigo', userCode);
                     
-                    console.log('✅ Usuario actualizado correctamente');
-                    setLoading(false);
+                    console.log('✅ Usuario actualizado correctamente con puntos:', userData.puntos);
+                    return true;
                 } else {
-                    throw new Error('Respuesta de API inválida o usuario no encontrado');
+                    console.error('❌ Respuesta de API inválida:', data);
+                    return false;
                 }
             } catch (apiError) {
-                console.error('❌ Error en API:', apiError.message);
-                handleAPIError(userCode, apiError);
-            }
-        };
-
-        const fetchDatosEnSegundoPlano = async (userCode) => {
-            try {
-                const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook-test/info-socio', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ codigo: userCode }),
-                    mode: 'cors'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.data) {
-                        const userData = {
-                            codigo: userCode,
-                            nombre: data.data.nombre || 'Usuario',
-                            email: data.data.email || '',
-                            puntos: data.data.puntos || 0,
-                            nivel: data.data.nivel || 'Bronce',
-                            proximaRecompensa: data.data.proximaRecompensa || 500,
-                            historial: Array.isArray(data.data.historial) ? data.data.historial : [],
-                            premios: Array.isArray(data.data.premios) ? data.data.premios : [],
-                            referidos: Array.isArray(data.data.referidos) ? data.data.referidos : []
-                        };
-                        setUsuario(userData);
-                        localStorage.setItem('picaflor_user', JSON.stringify(userData));
-                        console.log('✅ Datos sincronizados en segundo plano');
-                    }
+                if (apiError.name === 'AbortError') {
+                    console.error('⏱️ Timeout en el fetch a API (8 segundos)');
+                } else {
+                    console.error('❌ Error en fetch a API:', apiError.message);
                 }
-            } catch (err) {
-                console.log('ℹ️ No se pudo sincronizar con API, usando caché');
+                return false;
             }
-        };
-
-        const handleAPIError = (userCode, error) => {
-            console.log('🔍 Intentando usar datos en caché...');
-            const cached = localStorage.getItem('picaflor_user');
-            
-            if (cached) {
-                try {
-                    const cachedUser = JSON.parse(cached);
-                    if (cachedUser.codigo === userCode) {
-                        console.log('✅ Usando datos del caché como fallback');
-                        setUsuario({
-                            ...cachedUser,
-                            historial: Array.isArray(cachedUser.historial) ? cachedUser.historial : [],
-                            premios: Array.isArray(cachedUser.premios) ? cachedUser.premios : []
-                        });
-                        setLoading(false);
-                        return;
-                    }
-                } catch (parseErr) {
-                    console.error('❌ Error al parsear caché:', parseErr);
-                }
-            }
-            
-            // Si no hay caché valido, mostrar error
-            console.error('❌ No hay datos disponibles. Error:', error.message);
-            setLoading(false);
         };
 
         cargarDatosUsuario();
