@@ -477,7 +477,7 @@ const UserDashboard = () => {
                             </button>
                             <div className="flex items-center gap-3 mb-2">
                                 <BookOpen className="w-8 h-8" />
-                                <h2 className="text-2xl font-bold">Manual de Usuario</h2>
+                                <h2 className="text-2xl font-bold">Así funciona Club "Piscina Picaflor"</h2>
                             </div>
                             <p className="text-teal-100 text-sm">Guía rápida del programa de fidelización</p>
                         </div>
@@ -498,9 +498,15 @@ const UserDashboard = () => {
                                             Al llegar a la piscina, muestra tu <strong>QR Code</strong> al personal en la entrada. Ellos lo escanearán para registrar tu visita.
                                         </p>
                                         <div className="bg-white rounded-lg p-3 mt-2 border border-teal-300">
-                                            <div className="flex items-center gap-2 text-teal-800 text-xs font-medium">
-                                                <ChevronRight className="w-4 h-4" />
-                                                <span>Ganancia: +50 puntos por entrada</span>
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2 text-teal-800 text-xs font-medium">
+                                                    <ChevronRight className="w-4 h-4" />
+                                                    <span>Ganancia: +100 puntos por entrada</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-teal-800 text-xs font-medium">
+                                                    <ChevronRight className="w-4 h-4" />
+                                                    <span>+50 puntos si vienes referido</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -518,12 +524,12 @@ const UserDashboard = () => {
                                             <span>Invita Amigos</span>
                                         </h3>
                                         <p className="text-gray-700 text-sm leading-relaxed mb-2">
-                                            Comparte tu código de referido con amigos. Cuando se registren usando tu enlace, ambos ganan puntos extra.
+                                            Comparte tu código de referido con amigos. Cuando visiten Piscina Picaflor en tu nombre, ambos ganan puntos extra.
                                         </p>
                                         <div className="bg-white rounded-lg p-3 mt-2 border border-amber-300">
                                             <div className="flex items-center gap-2 text-amber-800 text-xs font-medium">
                                                 <ChevronRight className="w-4 h-4" />
-                                                <span>Ganancia: +100 puntos por referido exitoso</span>
+                                                <span>Ganancia: +50 puntos por referido exitoso</span>
                                             </div>
                                         </div>
                                     </div>
@@ -541,18 +547,12 @@ const UserDashboard = () => {
                                             <span>Canjea Premios</span>
                                         </h3>
                                         <p className="text-gray-700 text-sm leading-relaxed mb-2">
-                                            Acumula puntos y canjéalos por entradas gratis, descuentos especiales o productos exclusivos.
+                                            Acumula puntos y canjéalos por bebidas, helados, Asaditos o entradas gratis directamente en caja mostrando tu Dashboard.
                                         </p>
                                         <div className="bg-white rounded-lg p-3 mt-2 border border-purple-300">
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-purple-800 text-xs font-medium">
-                                                    <Gift className="w-4 h-4" />
-                                                    <span>500 pts = Entrada gratis</span>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-purple-800 text-xs font-medium">
-                                                    <Gift className="w-4 h-4" />
-                                                    <span>1000 pts = 2 entradas + bebida</span>
-                                                </div>
+                                            <div className="flex items-center gap-2 text-purple-800 text-xs font-medium">
+                                                <ChevronRight className="w-4 h-4" />
+                                                <span>Cada 200 puntos hay recompensas</span>
                                             </div>
                                         </div>
                                     </div>
