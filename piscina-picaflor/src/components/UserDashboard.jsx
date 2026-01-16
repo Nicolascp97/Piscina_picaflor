@@ -82,7 +82,10 @@ const UserDashboard = () => {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout de 8 segundos
 
-                console.log('Iniciando fetch a API...');
+                console.log('📨 Enviando request a API...');
+                console.log('   URL:', 'https://ppicaflor.app.n8n.cloud/webhook-test/info-socio');
+                console.log('   Body:', JSON.stringify({ codigo: userCode }));
+                
                 const fetchOptions = {
                     method: 'POST',
                     headers: {
@@ -97,14 +100,28 @@ const UserDashboard = () => {
                 const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook-test/info-socio', fetchOptions);
                 clearTimeout(timeoutId);
 
-                console.log('✅ Response recibida. Status:', response.status);
+                console.log('📥 Response recibida:');
+                console.log('   Status:', response.status);
+                console.log('   StatusText:', response.statusText);
+                console.log('   Content-Type:', response.headers.get('content-type'));
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const data = await response.json();
-                console.log('📦 JSON parseado:', data);
+                console.log('📦 RESPUESTA COMPLETA DE API:');
+                console.log(JSON.stringify(data, null, 2));
+                console.log('   data.success:', data.success);
+                console.log('   data.data:', data.data);
+                
+                if (data.data) {
+                    console.log('   ├─ nombre:', data.data.nombre);
+                    console.log('   ├─ puntos:', data.data.puntos);
+                    console.log('   ├─ nivel:', data.data.nivel);
+                    console.log('   ├─ email:', data.data.email);
+                    console.log('   └─ historial:', Array.isArray(data.data.historial) ? `${data.data.historial.length} items` : 'No es array');
+                }
 
                 if (data.success && data.data) {
                     console.log('✅ Datos válidos de API, actualizando estado...');
@@ -121,7 +138,8 @@ const UserDashboard = () => {
                         referidos: Array.isArray(data.data.referidos) ? data.data.referidos : []
                     };
 
-                    console.log('🎯 Datos a guardar:', userData);
+                    console.log('🎯 DATOS A GUARDAR:');
+                    console.log(JSON.stringify(userData, null, 2));
                     
                     // Actualizar estado
                     setUsuario(userData);
@@ -130,17 +148,22 @@ const UserDashboard = () => {
                     localStorage.setItem('picaflor_user', JSON.stringify(userData));
                     localStorage.setItem('picaflor_codigo', userCode);
                     
-                    console.log('✅ Usuario actualizado correctamente con puntos:', userData.puntos);
+                    console.log('✅ Estado actualizado. Puntos guardados:', userData.puntos);
                     return true;
                 } else {
-                    console.error('❌ Respuesta de API inválida:', data);
+                    console.error('❌ Respuesta de API inválida:');
+                    console.error('   success:', data.success);
+                    console.error('   data disponible:', !!data.data);
                     return false;
                 }
             } catch (apiError) {
                 if (apiError.name === 'AbortError') {
-                    console.error('⏱️ Timeout en el fetch a API (8 segundos)');
+                    console.error('⏱️ TIMEOUT: La API tardó más de 8 segundos en responder');
                 } else {
-                    console.error('❌ Error en fetch a API:', apiError.message);
+                    console.error('❌ ERROR EN FETCH:');
+                    console.error('   Tipo de error:', apiError.name);
+                    console.error('   Mensaje:', apiError.message);
+                    console.error('   Stack:', apiError.stack);
                 }
                 return false;
             }
