@@ -64,8 +64,11 @@ const UserDashboard = () => {
                 
                 if (cachedUser && cachedUser.codigo === code) {
                     console.log('⚠️ Usando datos del caché (Sin conexión a servidor)');
+                    // Asegurar que los puntos sean números incluso del caché
                     setUsuario({
                         ...cachedUser,
+                        puntos: parseInt(cachedUser.puntos) || 0,
+                        proximaRecompensa: parseInt(cachedUser.proximaRecompensa) || 500,
                         historial: Array.isArray(cachedUser.historial) ? cachedUser.historial : [],
                         premios: Array.isArray(cachedUser.premios) ? cachedUser.premios : []
                     });
@@ -133,9 +136,9 @@ const UserDashboard = () => {
                         codigo: userCode,
                         nombre: data.data.nombre || 'Usuario',
                         email: data.data.email || '',
-                        puntos: typeof data.data.puntos === 'number' ? data.data.puntos : 0,
+                        puntos: parseInt(data.data.puntos) || 0, // Convertir string a número
                         nivel: data.data.nivel || 'Bronce',
-                        proximaRecompensa: data.data.proximaRecompensa || 500,
+                        proximaRecompensa: parseInt(data.data.proximaRecompensa) || 500,
                         historial: Array.isArray(data.data.historial) ? data.data.historial : [],
                         premios: Array.isArray(data.data.premios) ? data.data.premios : [],
                         referidos: Array.isArray(data.data.referidos) ? data.data.referidos : []
