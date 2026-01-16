@@ -1,0 +1,214 @@
+{
+  "name": "Backend Dashboard - Picaflor",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "info-socio",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://www.piscinapicaflor.cl",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, GET, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Webhook Dashboard",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        544,
+        240
+      ],
+      "id": "3c8f2c34-0f2c-4d60-8154-c1389db0e049",
+      "webhookId": "1a332c68-c8fe-4431-9577-56057688e3fd"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appGADelCTQUUEbmg",
+          "mode": "list",
+          "cachedResultName": "Picaflor",
+          "cachedResultUrl": "https://airtable.com/appGADelCTQUUEbmg"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblTQWysdHGSdkHkN",
+          "mode": "list",
+          "cachedResultName": "Usuarios",
+          "cachedResultUrl": "https://airtable.com/appGADelCTQUUEbmg/tblTQWysdHGSdkHkN"
+        },
+        "filterByFormula": "={Codigo} = '{{ $json.body.codigo }}'",
+        "options": {}
+      },
+      "name": "Buscar Usuario",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        768,
+        240
+      ],
+      "id": "de8e42d2-06f1-4b06-8228-b1838476d9a5",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "wEUpSK1f0TxjiSVA",
+          "name": "Leer_usuario"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appGADelCTQUUEbmg",
+          "mode": "list",
+          "cachedResultName": "Picaflor",
+          "cachedResultUrl": "https://airtable.com/appGADelCTQUUEbmg"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLECAxD5pt8kgMF",
+          "mode": "list",
+          "cachedResultName": "Historiales de Puntos",
+          "cachedResultUrl": "https://airtable.com/appGADelCTQUUEbmg/tblLECAxD5pt8kgMF"
+        },
+        "filterByFormula": "={Relacionado Con Usuario} = '{{ $('Buscar Usuario').item.json.Codigo }}'",
+        "options": {},
+        "sort": {
+          "property": [
+            {
+              "field": "Fecha",
+              "direction": "desc"
+            }
+          ]
+        }
+      },
+      "name": "Buscar Historial",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        992,
+        240
+      ],
+      "id": "8fec5d63-dd1a-47f8-86d2-3193d08f2edb",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "wEUpSK1f0TxjiSVA",
+          "name": "Leer_usuario"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verificar que encontró el usuario\nconst userItems = $items(\"Buscar Usuario\");\n\nif (!userItems || userItems.length === 0 || !userItems[0].json.id) {\n  return {\n    success: false,\n    error: \"Usuario no encontrado\"\n  };\n}\n\nconst user = userItems[0].json;\n\n// Procesar historial (si existe)\nlet historial = [];\ntry {\n  const historyItems = $items(\"Buscar Historial\");\n  if (historyItems && historyItems.length > 0 && historyItems[0].json.id) {\n    historial = historyItems\n      .filter(h => h.json.Fecha) // Solo items válidos\n      .map(h => ({\n        id: h.json.id,\n        fecha: h.json.Fecha || \"Reciente\",\n        actividad: h.json[\"Descripción\"] || h.json[\"Tipo de Evento\"] || \"Movimiento\",\n        puntos: parseInt(h.json.Puntos) || 0\n      }));\n  }\n} catch (e) {\n  console.log(\"Error procesando historial:\", e);\n  historial = [];\n}\n\n// Limpiar código (remover comillas extras)\nconst codigoLimpio = String(user.Codigo || '').replace(/[\"']/g, '').trim();\n\n// Estructura final JSON\nreturn {\n  success: true,\n  data: {\n    nombre: user.Nombre || \"Usuario\",\n    codigo: codigoLimpio,\n    puntos: parseInt(user.Puntos) || 0,\n    email: user.Email || \"\",\n    historial: historial,\n    premios: [] // Premios vacíos - se manejan en frontend\n  }\n};"
+      },
+      "name": "Formatear Datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        240
+      ],
+      "id": "51bb9c0b-9893-4dae-b146-9e3cd1414446"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "name": "Responder al Dashboard",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        240
+      ],
+      "id": "384a47d9-ab0b-47bb-81ae-3d47ecea8641"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Buscar Usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Usuario": {
+      "main": [
+        [
+          {
+            "node": "Buscar Historial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Historial": {
+      "main": [
+        [
+          {
+            "node": "Formatear Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Datos": {
+      "main": [
+        [
+          {
+            "node": "Responder al Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "63089785-9b2d-4220-a54a-4a12d632c99e",
+  "meta": {
+    "instanceId": "cdcdf597feb52eba0e93f3a7ce4f7edbd2671169a94fae29eba9ae18e73b9443"
+  },
+  "id": "kIjedGSZE3mnjAk5bKqwk",
+  "tags": []
+}

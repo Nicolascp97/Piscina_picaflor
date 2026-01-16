@@ -353,7 +353,7 @@ const UserDashboard = () => {
                             Invitar Amigos
                         </span>
                         <span className="text-sm bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-semibold">
-                            +100 pts
+                            +50 pts
                         </span>
                     </button>
                 </div>
