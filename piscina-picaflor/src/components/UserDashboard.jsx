@@ -85,7 +85,7 @@ const UserDashboard = () => {
                 const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout de 8 segundos
 
                 console.log('📨 Enviando request a API...');
-                console.log('   URL:', 'https://ppicaflor.app.n8n.cloud/webhook-test/info-socio');
+                console.log('   URL:', 'https://ppicaflor.app.n8n.cloud/webhook/info-socio');
                 console.log('   Body:', JSON.stringify({ codigo: userCode }));
                 
                 const fetchOptions = {
@@ -99,7 +99,7 @@ const UserDashboard = () => {
                     signal: controller.signal
                 };
 
-                const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook-test/info-socio', fetchOptions);
+                const response = await fetch('https://ppicaflor.app.n8n.cloud/webhook/info-socio', fetchOptions);
                 clearTimeout(timeoutId);
 
                 console.log('📥 Response recibida:');
