@@ -48,23 +48,13 @@ const UserDashboard = () => {
             console.log('Dispositivo:', /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Móvil' : 'PC');
             
             try {
-                // PRIMERO intentar obtener datos reales de la API
-                console.log('📡 Consultando datos REALES del usuario desde API...');
-                const success = await fetchDatosDelAPI(code);
-                
-                if (success) {
-                    console.log('✅ Datos cargados exitosamente desde API');
-                    return;
-                }
-                
-                // Si la API falla, usar caché como fallback
-                console.log('🔍 API no disponible, intentando usar caché...');
+                // PRIMERO intentar cargar desde caché
                 const cached = localStorage.getItem('picaflor_user');
                 const cachedUser = cached ? JSON.parse(cached) : null;
                 
                 if (cachedUser && cachedUser.codigo === code) {
-                    console.log('⚠️ Usando datos del caché (Sin conexión a servidor)');
-                    // Asegurar que los puntos sean números incluso del caché
+                    console.log('✅ Datos encontrados en caché, usando inmediatamente');
+                    console.log('Caché:', cachedUser);
                     setUsuario({
                         ...cachedUser,
                         puntos: parseInt(cachedUser.puntos) || 0,
@@ -72,7 +62,13 @@ const UserDashboard = () => {
                         historial: Array.isArray(cachedUser.historial) ? cachedUser.historial : [],
                         premios: Array.isArray(cachedUser.premios) ? cachedUser.premios : []
                     });
-                } else {
+                }
+                
+                // LUEGO intentar actualizar desde API en segundo plano
+                console.log('📡 Intentando actualizar desde API...');
+                const success = await fetchDatosDelAPI(code);
+                
+                if (!success && !cachedUser) {
                     console.error('❌ No hay datos disponibles (API + Caché)');
                 }
                 

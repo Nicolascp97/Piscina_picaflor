@@ -11,20 +11,27 @@ const PopupExito = ({ datos, onClose }) => {
 
     // Extraer datos directamente de la respuesta del servidor
     const codigo = datos.codigo || null;
-    const puntos = datos.puntos || 20;
+    const puntos = parseInt(datos.puntos) || 20;
     const nombre = datos.nombre || localStorage.getItem('picaflor_temp_nombre') || 'Usuario';
 
-    // Guardar en localStorage para persistencia
+    // Guardar en localStorage para persistencia COMPLETA
     if (codigo) {
         const datosUsuario = {
-            nombre,
             codigo,
+            nombre,
+            email: datos.email || '',
             puntos,
+            nivel: 'Bronce',
+            proximaRecompensa: 500,
+            historial: [],
+            premios: [],
+            referidos: [],
             fechaRegistro: new Date().toISOString()
         };
         localStorage.setItem('picaflor_user', JSON.stringify(datosUsuario));
         localStorage.setItem('picaflor_codigo', codigo);
-        console.log('Datos guardados en localStorage:', datosUsuario);
+        localStorage.setItem('picaflor_current_user', codigo);
+        console.log('✅ Datos COMPLETOS guardados en localStorage:', datosUsuario);
     }
 
     const link_referidos = `https://piscina-picaflor.vercel.app/r/${codigo}`;
