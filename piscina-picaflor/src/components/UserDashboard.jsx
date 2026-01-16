@@ -10,7 +10,9 @@ import {
     Gift,
     Calendar,
     ChevronRight,
-    Sparkles
+    Sparkles,
+    BookOpen,
+    X
 } from 'lucide-react';
 
 const UserDashboard = () => {
@@ -30,6 +32,7 @@ const UserDashboard = () => {
         referidos: []
     });
     const [loading, setLoading] = useState(true);
+    const [isManualOpen, setIsManualOpen] = useState(false);
 
     useEffect(() => {
         const cargarDatosUsuario = async () => {
@@ -177,8 +180,8 @@ const UserDashboard = () => {
         navigate('/');
     };
 
-    const handleScanSimulation = () => {
-        alert('🎉 ¡Escaneo simulado! En producción, esto activaría la cámara o validaría la entrada.');
+    const handleManualOpen = () => {
+        setIsManualOpen(true);
     };
 
     const handleInviteFriends = () => {
@@ -219,6 +222,16 @@ const UserDashboard = () => {
     const puntosParaRecompensa = Math.max(0, (usuario.proximaRecompensa || 500) - (usuario.puntos || 0));
     const progresoRecompensa = Math.min(100, ((usuario.puntos || 0) / (usuario.proximaRecompensa || 500)) * 100);
 
+    // Log de depuración antes de renderizar
+    console.log('🎨 RENDERIZANDO DASHBOARD:');
+    console.log('   usuario completo:', usuario);
+    console.log('   usuario.nombre:', usuario?.nombre);
+    console.log('   usuario.puntos:', usuario?.puntos);
+    console.log('   usuario.codigo:', usuario?.codigo);
+    console.log('   Tipo de puntos:', typeof usuario?.puntos);
+    console.log('   Valor numérico de puntos:', Number(usuario?.puntos));
+    console.log('   Valor de loading:', loading);
+
     const getIconoActividad = (tipo) => {
         switch(tipo) {
             case 'entrada': return <Scan className="w-4 h-4" />;
@@ -236,7 +249,7 @@ const UserDashboard = () => {
                 <div className="max-w-md mx-auto flex items-center justify-between">
                     <div>
                         <p className="text-teal-50 text-sm font-medium">¡Hola!</p>
-                        <h1 className="text-white text-2xl font-bold">{usuario?.nombre || 'Usuario'}</h1>
+                        <h1 className="text-white text-2xl font-bold">{String(usuario?.nombre || 'Usuario')}</h1>
                     </div>
                     <button 
                         onClick={handleLogout}
@@ -259,7 +272,7 @@ const UserDashboard = () => {
                         <div className="relative z-10">
                             <div className="bg-white p-6 rounded-2xl inline-block shadow-2xl mb-4">
                                 <QRCodeSVG
-                                    value={`https://piscina-picaflor.vercel.app/dashboard/${usuario?.codigo || 'PICA-0000'}`}
+                                    value={`https://piscina-picaflor.vercel.app/dashboard/${String(usuario?.codigo || 'PICA-0000')}`}
                                     size={180}
                                     level="H"
                                     includeMargin={false}
@@ -270,7 +283,7 @@ const UserDashboard = () => {
                             <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-xl inline-block">
                                 <p className="text-teal-50 text-xs font-medium mb-1">Tu código</p>
                                 <p className="text-white text-3xl font-black tracking-wider font-mono">
-                                    {usuario?.codigo || 'PICA-0000'}
+                                    {String(usuario?.codigo || 'PICA-0000')}
                                 </p>
                             </div>
                         </div>
@@ -285,10 +298,10 @@ const UserDashboard = () => {
                             <div className="flex items-center justify-center gap-2">
                                 <Trophy className="w-8 h-8 text-amber-500" />
                                 <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#00d1b2] to-[#00b89c]">
-                                    {usuario?.puntos || 0}
+                                    {Number(usuario?.puntos) || 0}
                                 </span>
                             </div>
-                            <p className="text-gray-400 text-xs mt-2">Nivel {usuario?.nivel || 'Bronce'}</p>
+                            <p className="text-gray-400 text-xs mt-2">Nivel {String(usuario?.nivel || 'Bronce')}</p>
                         </div>
 
                         {/* Barra de Progreso */}
@@ -322,12 +335,12 @@ const UserDashboard = () => {
                 {/* Acciones Rápidas */}
                 <div className="grid grid-cols-1 gap-4">
                     <button 
-                        onClick={handleScanSimulation}
+                        onClick={handleManualOpen}
                         className="bg-gradient-to-r from-[#00d1b2] to-[#00b89c] text-white py-5 px-6 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-between group"
                     >
                         <span className="flex items-center gap-3">
-                            <Scan className="w-7 h-7" />
-                            Escanear en Entrada
+                            <BookOpen className="w-7 h-7" />
+                            Manual de Usuario
                         </span>
                         <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                     </button>
@@ -449,6 +462,123 @@ const UserDashboard = () => {
                     </p>
                 </div>
             </div>
+
+            {/* Manual de Usuario Popup */}
+            {isManualOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden animate-fade-in-up">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-[#00d1b2] to-[#00b89c] p-6 text-white relative">
+                            <button 
+                                onClick={() => setIsManualOpen(false)}
+                                className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                            <div className="flex items-center gap-3 mb-2">
+                                <BookOpen className="w-8 h-8" />
+                                <h2 className="text-2xl font-bold">Manual de Usuario</h2>
+                            </div>
+                            <p className="text-teal-100 text-sm">Guía rápida del programa de fidelización</p>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6 max-h-[60vh] overflow-y-auto">
+                            {/* Paso 1 */}
+                            <div className="mb-6 bg-teal-50 rounded-xl p-4 border-2 border-teal-200">
+                                <div className="flex items-start gap-3">
+                                    <div className="bg-gradient-to-r from-[#00d1b2] to-[#00b89c] text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 mt-1">
+                                        1
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-teal-900 mb-2 flex items-center gap-2">
+                                            <span>Escaneo en Entrada</span>
+                                        </h3>
+                                        <p className="text-gray-700 text-sm leading-relaxed mb-2">
+                                            Al llegar a la piscina, muestra tu <strong>QR Code</strong> al personal en la entrada. Ellos lo escanearán para registrar tu visita.
+                                        </p>
+                                        <div className="bg-white rounded-lg p-3 mt-2 border border-teal-300">
+                                            <div className="flex items-center gap-2 text-teal-800 text-xs font-medium">
+                                                <ChevronRight className="w-4 h-4" />
+                                                <span>Ganancia: +50 puntos por entrada</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Paso 2 */}
+                            <div className="mb-6 bg-amber-50 rounded-xl p-4 border-2 border-amber-200">
+                                <div className="flex items-start gap-3">
+                                    <div className="bg-gradient-to-r from-amber-400 to-orange-400 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 mt-1">
+                                        2
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-amber-900 mb-2 flex items-center gap-2">
+                                            <span>Invita Amigos</span>
+                                        </h3>
+                                        <p className="text-gray-700 text-sm leading-relaxed mb-2">
+                                            Comparte tu código de referido con amigos. Cuando se registren usando tu enlace, ambos ganan puntos extra.
+                                        </p>
+                                        <div className="bg-white rounded-lg p-3 mt-2 border border-amber-300">
+                                            <div className="flex items-center gap-2 text-amber-800 text-xs font-medium">
+                                                <ChevronRight className="w-4 h-4" />
+                                                <span>Ganancia: +100 puntos por referido exitoso</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Paso 3 */}
+                            <div className="mb-2 bg-purple-50 rounded-xl p-4 border-2 border-purple-200">
+                                <div className="flex items-start gap-3">
+                                    <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 mt-1">
+                                        3
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                                            <span>Canjea Premios</span>
+                                        </h3>
+                                        <p className="text-gray-700 text-sm leading-relaxed mb-2">
+                                            Acumula puntos y canjéalos por entradas gratis, descuentos especiales o productos exclusivos.
+                                        </p>
+                                        <div className="bg-white rounded-lg p-3 mt-2 border border-purple-300">
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2 text-purple-800 text-xs font-medium">
+                                                    <Gift className="w-4 h-4" />
+                                                    <span>500 pts = Entrada gratis</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-purple-800 text-xs font-medium">
+                                                    <Gift className="w-4 h-4" />
+                                                    <span>1000 pts = 2 entradas + bebida</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Nota importante */}
+                            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <p className="text-blue-900 text-sm">
+                                    <strong>💡 Tip:</strong> Los puntos se acumulan automáticamente. Revisa tu historial en la sección de abajo para ver todas tus transacciones.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 p-4 border-t border-gray-200">
+                            <button 
+                                onClick={() => setIsManualOpen(false)}
+                                className="w-full bg-gradient-to-r from-[#00d1b2] to-[#00b89c] text-white py-3 px-6 rounded-xl font-bold hover:shadow-lg transition-all"
+                            >
+                                Entendido
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
