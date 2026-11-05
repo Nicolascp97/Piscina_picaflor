@@ -2,12 +2,14 @@
 import Base from '../layouts/Base.astro';
 import Footer from '../components/Footer.astro';
 import Dato from '../components/Dato.astro';
-import { config } from '../lib/config';
+import { config, avance } from '../lib/config';
 const C = config.consentimiento;
 ---
-<Base titulo="Privacidad | Piscina Picaflor" descripcion="Cómo cuidamos tus datos al sacar el Pase de Apertura." barra={false}>
+<Base titulo="Privacidad | Piscina Picaflor" descripcion="Cómo cuidamos tus datos al sacar el Pase de Apertura." barra={false} noindex={avance}>
   <main class="mx-auto max-w-2xl px-5 py-10 text-base leading-relaxed">
     <h1 class="text-3xl font-extrabold">Privacidad</h1>
+    {avance && <p class="mt-3 rounded-xl bg-espuma-100 p-4">Estamos preparando esta página. Todavía no pedimos datos en este sitio.</p>}
+    {!avance && (<>
     <p class="mt-3">Esta es la política de privacidad del Pase de Apertura de {config.negocio.nombre}, en {config.negocio.comuna}. Está escrita en simple, a propósito.</p>
 
     <h2 class="mt-8 text-xl font-bold">Quién es responsable de tus datos</h2>
@@ -33,6 +35,7 @@ const C = config.consentimiento;
     <h2 class="mt-8 text-xl font-bold">Tus derechos</h2>
     <p class="mt-2">Puedes pedirnos ver tus datos, corregirlos, borrarlos, oponerte a que los usemos o llevártelos. Escríbenos por WhatsApp o al correo de arriba. Para dejar de recibir ofertas, escribe BAJA.</p>
     <p class="mt-8 text-sm text-oceano-900/70">Versión del texto de consentimiento: {C.version}</p>
+    </>)}
   </main>
   <Footer />
 </Base>

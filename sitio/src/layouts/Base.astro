@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { config, datosCliente, waLink } from '../lib/config';
+import { config, datosCliente, waLink, wspDigitos } from '../lib/config';
 import BarraMovil from '../components/BarraMovil.astro';
 const { titulo, descripcion, noindex = false, barra = true } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
@@ -26,13 +26,13 @@ const datos = JSON.stringify(datosCliente()).replace(/</g, '\u003c');
   <body>
     <div id="aviso-fidelidad" hidden class="bg-sol-400 px-5 py-3 text-center text-base font-semibold text-oceano-950">
       {config.textos.aviso_fidelidad}
-      <a href={waLink(config.whatsapp_mensajes.general)} data-wsp="aviso" class="underline">{config.textos.whatsapp.boton}</a>
+      {wspDigitos() && <a href={waLink(config.whatsapp_mensajes.general)} data-wsp="aviso" class="underline">{config.textos.whatsapp.boton}</a>}
     </div>
     <slot />
     {barra && <BarraMovil />}
-    <noscript>
+    {wspDigitos() && <noscript>
       <p class="px-5 py-6 text-center text-lg">Para sacar tu Pase necesitas activar JavaScript. Mientras tanto, <a class="font-bold underline" href={waLink(config.whatsapp_mensajes.general)}>escríbenos por WhatsApp</a>.</p>
-    </noscript>
+    </noscript>}
     <script id="pase-datos" type="application/json" set:html={datos} />
     <script>
       import '../scripts/main.ts';

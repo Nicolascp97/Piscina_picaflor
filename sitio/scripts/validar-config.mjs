@@ -8,6 +8,7 @@ import { dirname, join } from 'node:path';
 const aqui = dirname(fileURLToPath(import.meta.url));
 const cfg = JSON.parse(readFileSync(join(aqui, '..', 'src', 'config', 'negocio.json'), 'utf8'));
 const prod = process.env.VERCEL_ENV === 'production' || process.env.MODO === 'prod';
+const avance = process.env.PUBLIC_MODO_AVANCE === '1';
 
 const pendientes = [];
 function recorrer(v, ruta) {
@@ -25,7 +26,9 @@ function recorrer(v, ruta) {
 recorrer(cfg, '');
 
 const errores = [];
-if (prod) {
+if (prod && avance) {
+  console.log("AVISO: MODO AVANCE activo. Se publica una pagina previa (formulario cerrado, sin datos pendientes). NO es el lanzamiento: para lanzar, quitar PUBLIC_MODO_AVANCE.");
+} else if (prod) {
   for (const p of pendientes) errores.push('Dato pendiente: ' + p);
   const wsp = String(cfg.negocio.whatsapp_e164).replace(/\s/g, '');
   if (!/^\+?569\d{8}$/.test(wsp)) errores.push('negocio.whatsapp_e164 debe ser +569XXXXXXXX');

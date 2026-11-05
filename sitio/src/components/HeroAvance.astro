@@ -1,0 +1,17 @@
+---
+import { config } from '../lib/config';
+const A = config.textos.avance;
+const ig = config.negocio.instagram;
+---
+<section class="relative isolate overflow-hidden bg-gradient-to-br from-oceano-950 via-oceano-900 to-oceano-700 text-white">
+  <div class="mx-auto flex min-h-[92svh] max-w-3xl flex-col justify-center px-5 py-12">
+    <p class="mb-4 inline-flex w-fit items-center rounded-full bg-white/12 px-3 py-1.5 text-sm text-turquesa-300 ring-1 ring-white/20">{A.chip}</p>
+    <p class="text-sm font-semibold uppercase tracking-widest text-turquesa-300">{config.negocio.nombre}</p>
+    <h1 class="mt-2 text-6xl font-extrabold leading-[1.02] sm:text-8xl">{A.titular}</h1>
+    <p class="mt-5 max-w-xl text-xl text-white/90">{A.bajada}</p>
+    <p class="mt-6 inline-flex w-fit rounded-2xl bg-sol-400 px-4 py-2 text-base font-extrabold text-oceano-950">{A.nota}</p>
+    <div class="mt-8">
+      <a href={'https://instagram.com/' + ig} target="_blank" rel="noopener" class="inline-flex min-h-14 items-center justify-center rounded-full border-2 border-white/80 px-8 text-lg font-bold text-white hover:bg-white/10">{A.ig} · @{ig}</a>
+    </div>
+  </div>
+</section>

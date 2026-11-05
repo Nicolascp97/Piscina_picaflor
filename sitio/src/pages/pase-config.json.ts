@@ -1,9 +1,9 @@
-import { config } from '../lib/config';
+import { config, avance } from '../lib/config';
 
 // Apps Script lee esta URL para conocer las reglas vigentes del Pase (cupos, vigencia, activo).
 // Es la misma fuente que usa el sitio: negocio.json.
 export function GET() {
-  const cuerpo = {
+  const cuerpo = avance ? { pase: { activo: false } } : {
     pase: config.pase,
     apertura: config.apertura,
     consentimiento: { version: config.consentimiento.version },

@@ -1,6 +1,8 @@
 import cfg from '../config/negocio.json';
 
 export const config = cfg;
+/** Modo avance: pagina previa al lanzamiento. Se activa SOLO con PUBLIC_MODO_AVANCE=1 (nunca por defecto). */
+export const avance = import.meta.env.PUBLIC_MODO_AVANCE === "1";
 export const PENDIENTE = '[POR CONFIRMAR]';
 export const esPendiente = (v: unknown): boolean => typeof v === 'string' && v.includes(PENDIENTE);
 
@@ -18,6 +20,7 @@ export function waLink(mensaje?: string): string {
 
 /** Datos que viajan al navegador (nada secreto). */
 export function datosCliente() {
+  if (avance) return { avance: true, dev: false, endpoint: "", pixelId: "", wsp: "" };
   return {
     dev: import.meta.env.DEV,
     endpoint: import.meta.env.PUBLIC_PASE_ENDPOINT || '',

@@ -10,9 +10,12 @@ import Ubicacion from '../components/Ubicacion.astro';
 import Faq from '../components/Faq.astro';
 import Cierre from '../components/Cierre.astro';
 import Footer from '../components/Footer.astro';
+import HeroAvance from '../components/HeroAvance.astro';
+import { avance } from '../lib/config';
 ---
-<Base titulo="Abrimos el 20 · Pase de Apertura | Piscina Picaflor, Litueche" descripcion="Arrienda la piscina completa por el día en Litueche. Saca tu Pase de Apertura gratis y reserva con descuento por WhatsApp.">
+<Base barra={!avance} titulo={avance ? "Abrimos el 20 | Piscina Picaflor, Litueche" : "Abrimos el 20 · Pase de Apertura | Piscina Picaflor, Litueche"} descripcion={avance ? "Arriendo de piscina por día en Litueche. Abrimos el 20 de noviembre." : "Arrienda la piscina completa por el día en Litueche. Saca tu Pase de Apertura gratis y reserva con descuento por WhatsApp."}>
   <main>
+    {avance ? <HeroAvance /> : (<>
     <Hero />
     <PaseForm />
     <Incluye />
@@ -22,6 +25,7 @@ import Footer from '../components/Footer.astro';
     <Ubicacion />
     <Faq />
     <Cierre />
+    </>)}
   </main>
   <Footer />
 </Base>

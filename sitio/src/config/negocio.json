@@ -150,10 +150,17 @@
       "pase": "Mi Pase",
       "wsp": "WhatsApp"
     },
-    "aviso_fidelidad": "Estamos renovando el programa de puntos. Tus datos están guardados. Escríbenos por WhatsApp y te ayudamos.",
+    "aviso_fidelidad": "Estamos renovando el programa de puntos. Tus datos están guardados.",
     "footer": {
       "legal": "© 2026 Piscina Picaflor · Litueche",
       "privacidad": "Privacidad"
+    },
+    "avance": {
+      "chip": "Arriendo de piscina por día · Litueche",
+      "titular": "Abrimos el 20",
+      "bajada": "Estamos preparando la apertura de la temporada. Muy pronto podrás sacar aquí tu Pase de Apertura.",
+      "nota": "Los Pases de Apertura abren pronto.",
+      "ig": "Síguenos en Instagram para enterarte primero"
     }
   },
   "prueba_social": [],
