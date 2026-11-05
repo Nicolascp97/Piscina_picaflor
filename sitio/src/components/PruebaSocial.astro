@@ -1,0 +1,11 @@
+---
+import { config } from '../lib/config';
+const items = config.prueba_social as { texto: string; autor: string }[];
+---
+{items.length > 0 && (
+  <section class="bg-white px-5 py-12 sm:py-16">
+    <div class="mx-auto max-w-3xl space-y-4">
+      {items.map((i) => <figure class="rounded-2xl bg-espuma-100 p-5"><blockquote class="text-lg">{i.texto}</blockquote><figcaption class="mt-2 text-sm font-semibold text-oceano-700">{i.autor}</figcaption></figure>)}
+    </div>
+  </section>
+)}

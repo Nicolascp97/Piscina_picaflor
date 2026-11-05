@@ -41,7 +41,7 @@ PLAN-LANDING-2026-11.md  Contrato de trabajo
 Página HTML con código único `PICA-XXXX`, QR, nombre del titular, descuento, días válidos, cupos, vigencia y condiciones: un solo uso, nominal, no acumulable, se valida **al reservar por WhatsApp** (no en la puerta) y no vale en días de alta demanda. Idempotente: el mismo WhatsApp no genera dos Pases. Estados en la hoja: emitido / canjeado / vencido / anulado.
 
 ## Comandos
-Se completan cuando exista `sitio/` (tarea T1.1): `npm run dev`, `npm run build`, `npm run validar`.
+En `sitio/`: `npm run dev` (desarrollo, modo demo sin backend) · `npm run build:preview` (build sin exigir datos) · `npm run build` (produccion: falla si queda un `[POR CONFIRMAR]` o falta `PUBLIC_PASE_ENDPOINT` / `PUBLIC_META_PIXEL_ID`) · `npm run validar` · `npm run imagenes`. Backend: `node apps-script/test/probar.mjs`.
 
 ## Despliegue
 Vercel (proyecto `piscina-picaflor`, dominio `piscinapicaflor.cl`). Root Directory `sitio`. Reversa: Instant Rollback en Vercel + `git revert`. Quién autoriza: Nico.

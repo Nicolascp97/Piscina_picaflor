@@ -1,0 +1,166 @@
+{
+  "_ayuda": "UNICA fuente de contenido y reglas del Pase. Todo lo que diga [POR CONFIRMAR] lo trae el dueno. El build de produccion falla si queda alguno. Se publica la parte pase en /pase-config.json.",
+  "negocio": {
+    "nombre": "Piscina Picaflor",
+    "sector": "Picaflor",
+    "comuna": "Litueche",
+    "region": "O'Higgins",
+    "whatsapp_e164": "[POR CONFIRMAR]",
+    "whatsapp_candidato_sin_confirmar": "56975003757",
+    "instagram": "piscinapicaflor",
+    "facebook": "Piscina Picaflor",
+    "maps_url": "[POR CONFIRMAR]",
+    "responsable_datos": "[POR CONFIRMAR]",
+    "correo_contacto": "[POR CONFIRMAR]"
+  },
+  "apertura": {
+    "fecha": "2026-11-20",
+    "titular": "Abrimos el 20"
+  },
+  "arriendo": {
+    "mostrar_precio": false,
+    "precio_dia": "[POR CONFIRMAR]",
+    "precio_texto": "[POR CONFIRMAR]",
+    "capacidad": "[POR CONFIRMAR]",
+    "horario": "[POR CONFIRMAR]",
+    "incluye": [
+      "[POR CONFIRMAR]"
+    ]
+  },
+  "pase": {
+    "activo": true,
+    "descuento_tipo": "[POR CONFIRMAR]",
+    "descuento_valor": "[POR CONFIRMAR]",
+    "descuento_texto": "[POR CONFIRMAR]",
+    "dias_validos": "[POR CONFIRMAR]",
+    "fechas_excluidas_alta_demanda": "[POR CONFIRMAR]",
+    "cupos_totales": "[POR CONFIRMAR]",
+    "emision_hasta": "[POR CONFIRMAR]",
+    "vigencia_hasta": "[POR CONFIRMAR]",
+    "condiciones": [
+      "Un solo uso.",
+      "Es nominal: solo lo puede usar su titular.",
+      "No es acumulable con otras ofertas.",
+      "Se valida al reservar por WhatsApp, no en la puerta.",
+      "No vale en días de alta demanda."
+    ],
+    "version_condiciones": "v1"
+  },
+  "consentimiento": {
+    "version": "v1-2026-11",
+    "linea_informativa": "Usamos tu nombre y tu WhatsApp para entregarte el Pase y coordinar tu reserva.",
+    "casilla": "Quiero recibir ofertas de Piscina Picaflor por WhatsApp o correo, y que usen mi número para mostrarme sus anuncios en Instagram y Facebook. Puedo pedir que me saquen cuando quiera escribiendo BAJA.",
+    "retencion_meses": 12
+  },
+  "textos": {
+    "hero": {
+      "talla": "Pronóstico para Litueche: lluvia de patos asados, 80%",
+      "titular": "Abrimos el 20",
+      "bajada": "Arrienda la piscina completa por el día y celébralo con los tuyos. Saca tu Pase de Apertura y reserva con descuento.",
+      "cta": "Quiero mi Pase de Apertura",
+      "microcopy": "Gratis · toma 30 segundos · lo usas al reservar por WhatsApp",
+      "alt_foto": "Piscina Picaflor en Litueche"
+    },
+    "formulario": {
+      "titulo": "Tu Pase de Apertura",
+      "bajada": "Déjanos tus datos y te lo mostramos al tiro. Lo puedes guardar en tu galería.",
+      "nombre": "Tu nombre",
+      "whatsapp": "Tu WhatsApp",
+      "whatsapp_ayuda": "Ejemplo: 9 1234 5678",
+      "correo": "Tu correo (opcional)",
+      "correo_ayuda": "Para mandarte una copia del Pase",
+      "celebracion": "¿Qué quieres celebrar o para qué fecha? (opcional)",
+      "celebracion_opciones": [
+        "Cumpleaños",
+        "Familia",
+        "Empresa",
+        "Bautizo o matrimonio",
+        "Solo disfrutar"
+      ],
+      "boton": "Obtener mi Pase",
+      "enviando": "Preparando tu Pase…",
+      "errores": {
+        "nombre": "Escribe tu nombre.",
+        "whatsapp": "Revisa tu WhatsApp: tiene que ser un celular chileno, por ejemplo 9 1234 5678.",
+        "correo": "Revisa tu correo, parece que le falta algo.",
+        "red": "No pudimos conectarnos. Revisa tu internet y vuelve a intentar, o escríbenos por WhatsApp y te damos tu Pase igual.",
+        "cerrado": "Ya cerramos la entrega de Pases. Escríbenos por WhatsApp y te contamos cómo reservar.",
+        "agotado": "Se acabaron los Pases de Apertura. Escríbenos por WhatsApp: igual te ayudamos con tu reserva."
+      },
+      "existente": "Ya tenías un Pase con este WhatsApp. Aquí lo tienes de nuevo."
+    },
+    "pase": {
+      "titulo": "Pase de Apertura",
+      "titular_de": "Titular",
+      "codigo": "Tu código",
+      "vigencia": "Válido hasta",
+      "dias": "Días válidos",
+      "excluidas": "No vale en",
+      "cupos": "Cupos limitados",
+      "reservar": "Reservar por WhatsApp con mi Pase",
+      "guardar": "Guardar en mi galería",
+      "copiar": "Copiar código",
+      "copiado": "Código copiado",
+      "mantener": "Mantén apretada la imagen para guardarla en tu galería.",
+      "correo_enviado": "Te mandamos una copia a tu correo.",
+      "demo": "Pase de demostración, no es válido"
+    },
+    "incluye": {
+      "titulo": "Qué incluye tu día",
+      "nota": "La piscina completa es solo para ti y los tuyos durante todo el día."
+    },
+    "como": {
+      "titulo": "Cómo funciona",
+      "pasos": [
+        {
+          "t": "Saca tu Pase",
+          "d": "Déjanos tu nombre y tu WhatsApp. Lo ves al tiro y lo guardas en tu galería."
+        },
+        {
+          "t": "Escríbenos por WhatsApp",
+          "d": "Mándanos tu código y la fecha que te interesa. Nosotros te confirmamos disponibilidad."
+        },
+        {
+          "t": "Reserva con descuento",
+          "d": "Al reservar validamos tu Pase y aplicamos el descuento. No se valida en la puerta."
+        }
+      ]
+    },
+    "galeria": {
+      "titulo": "El lugar"
+    },
+    "donde": {
+      "titulo": "Dónde queda",
+      "bajada": "Sector Picaflor, comuna de Litueche, Región de O'Higgins.",
+      "ruta": "[POR CONFIRMAR]",
+      "boton": "Abrir en Google Maps"
+    },
+    "faq": {
+      "titulo": "Preguntas frecuentes"
+    },
+    "cierre": {
+      "titulo": "Abrimos el 20. Parte con tu Pase.",
+      "bajada": "Los Pases son limitados. Sácalo ahora y reserva tu día."
+    },
+    "whatsapp": {
+      "boton": "Escríbenos por WhatsApp",
+      "aria": "Escribir por WhatsApp"
+    },
+    "barra": {
+      "pase": "Mi Pase",
+      "wsp": "WhatsApp"
+    },
+    "aviso_fidelidad": "Estamos renovando el programa de puntos. Tus datos están guardados. Escríbenos por WhatsApp y te ayudamos.",
+    "footer": {
+      "legal": "© 2026 Piscina Picaflor · Litueche",
+      "privacidad": "Privacidad"
+    }
+  },
+  "prueba_social": [],
+  "galeria": [],
+  "faq": [],
+  "whatsapp_mensajes": {
+    "general": "Hola, quiero reservar la piscina en Piscina Picaflor.",
+    "con_pase": "Hola, tengo el Pase de Apertura {codigo} a nombre de {nombre}. Quiero reservar la piscina. {link}"
+  }
+}

@@ -1,0 +1,8 @@
+---
+import { config, waLink } from '../lib/config';
+const B = config.textos.barra;
+---
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-oceano-700/15 bg-white/95 px-3 py-2 backdrop-blur sm:hidden" style="padding-bottom:max(0.5rem, env(safe-area-inset-bottom))">
+  <a href="#pase" class="flex min-h-12 flex-1 items-center justify-center rounded-full bg-sol-400 text-base font-extrabold text-oceano-950">{B.pase}</a>
+  <a href={waLink(config.whatsapp_mensajes.general)} data-wsp="barra" aria-label={config.textos.whatsapp.aria} class="flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 text-base font-bold text-white">{B.wsp}</a>
+</div>

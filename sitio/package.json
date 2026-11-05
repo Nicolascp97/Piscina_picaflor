@@ -1,0 +1,24 @@
+{
+  "name": "picaflor-sitio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "validar": "node scripts/validar-config.mjs",
+    "build": "node scripts/validar-config.mjs && astro build",
+    "build:preview": "astro build",
+    "preview": "astro preview",
+    "imagenes": "node scripts/optimizar-imagenes.mjs"
+  },
+  "dependencies": {
+    "astro": "5.18.2",
+    "@tailwindcss/vite": "4.1.18",
+    "tailwindcss": "4.1.18",
+    "qrcode-generator": "2.0.4"
+  },
+  "devDependencies": {
+    "sharp": "0.34.5",
+    "heic-convert": "2.1.0"
+  }
+}

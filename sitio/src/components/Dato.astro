@@ -1,0 +1,6 @@
+---
+import { esPendiente } from '../lib/config';
+const { v } = Astro.props;
+const pend = esPendiente(v);
+---
+{pend ? <span class="pendiente">{v}</span> : <>{v}</>}

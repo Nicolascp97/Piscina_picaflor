@@ -1,0 +1,15 @@
+---
+import { config } from '../lib/config';
+import Dato from './Dato.astro';
+const D = config.textos.donde;
+const mapa = String(config.negocio.maps_url);
+const ok = /^https:\/\//.test(mapa);
+---
+<section class="bg-white px-5 py-12 sm:py-16">
+  <div class="mx-auto max-w-3xl">
+    <h2 class="text-3xl font-extrabold">{D.titulo}</h2>
+    <p class="mt-2 text-lg">{D.bajada}</p>
+    <p class="mt-2 text-base text-oceano-900/85"><Dato v={D.ruta} /></p>
+    <a href={ok ? mapa : '#sin-mapa'} target="_blank" rel="noopener" class="mt-5 inline-flex min-h-12 items-center justify-center rounded-full border-2 border-oceano-900 px-6 text-base font-bold text-oceano-900">{D.boton}{!ok && <span class="pendiente ml-2">[POR CONFIRMAR]</span>}</a>
+  </div>
+</section>

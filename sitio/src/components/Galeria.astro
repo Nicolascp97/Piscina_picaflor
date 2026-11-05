@@ -1,0 +1,18 @@
+---
+import { Picture } from 'astro:assets';
+import { config } from '../lib/config';
+import { galeria } from '../lib/fotos';
+const fotos = galeria();
+---
+{fotos.length > 0 && (
+  <section class="bg-arena-50 px-5 py-12 sm:py-16">
+    <div class="mx-auto max-w-5xl">
+      <h2 class="text-3xl font-extrabold">{config.textos.galeria.titulo}</h2>
+      <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {fotos.map((f) => (
+          <Picture src={f.img} formats={['avif', 'webp']} widths={[360, 640, 960]} sizes="(min-width: 640px) 33vw, 50vw" alt={config.textos.hero.alt_foto} loading="lazy" class="aspect-[4/5] w-full rounded-2xl object-cover" />
+        ))}
+      </div>
+    </div>
+  </section>
+)}

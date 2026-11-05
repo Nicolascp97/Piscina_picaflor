@@ -1,0 +1,20 @@
+---
+import { config } from '../lib/config';
+import Dato from './Dato.astro';
+const I = config.textos.incluye;
+const A = config.arriendo;
+---
+<section class="bg-arena-50 px-5 py-12 sm:py-16">
+  <div class="mx-auto max-w-3xl">
+    <h2 class="text-3xl font-extrabold">{I.titulo}</h2>
+    <p class="mt-2 text-lg text-oceano-900/85">{I.nota}</p>
+    <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+      {A.incluye.map((x) => <li class="rounded-2xl bg-white px-4 py-3 text-lg shadow-sm ring-1 ring-oceano-700/10"><Dato v={x} /></li>)}
+    </ul>
+    <dl class="mt-6 grid gap-3 sm:grid-cols-3">
+      <div class="rounded-2xl bg-espuma-100 px-4 py-3"><dt class="text-sm font-semibold uppercase tracking-wide text-oceano-700">Capacidad</dt><dd class="text-lg font-bold"><Dato v={A.capacidad} /></dd></div>
+      <div class="rounded-2xl bg-espuma-100 px-4 py-3"><dt class="text-sm font-semibold uppercase tracking-wide text-oceano-700">Horario</dt><dd class="text-lg font-bold"><Dato v={A.horario} /></dd></div>
+      {A.mostrar_precio && <div class="rounded-2xl bg-espuma-100 px-4 py-3"><dt class="text-sm font-semibold uppercase tracking-wide text-oceano-700">Precio por día</dt><dd class="text-lg font-bold"><Dato v={A.precio_texto} /></dd></div>}
+    </dl>
+  </div>
+</section>

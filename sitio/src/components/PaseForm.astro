@@ -1,0 +1,98 @@
+---
+import { config } from '../lib/config';
+import Dato from './Dato.astro';
+const F = config.textos.formulario;
+const P = config.textos.pase;
+const C = config.consentimiento;
+const campo = 'mt-1 block min-h-12 w-full rounded-xl border-2 border-oceano-700/25 bg-white px-4 text-base text-oceano-950 placeholder:text-oceano-700/50 focus:border-turquesa-500';
+---
+<section id="pase" class="scroll-mt-4 bg-espuma-100 px-5 py-12 sm:py-16">
+  <div class="mx-auto max-w-xl">
+
+    <div id="pase-form-wrap">
+      <h2 class="text-3xl font-extrabold text-oceano-950">{F.titulo}</h2>
+      <p class="mt-2 text-lg text-oceano-900/85">{F.bajada}</p>
+
+      <form id="pase-form" class="mt-6 rounded-3xl bg-white p-5 shadow-lg ring-1 ring-oceano-700/10 sm:p-7" novalidate>
+        <label class="block text-base font-semibold" for="nombre">{F.nombre}
+          <input id="nombre" name="nombre" type="text" autocomplete="name" maxlength="60" required class={campo} />
+        </label>
+        <p id="err-nombre" class="mt-1 text-sm font-medium text-red-700" hidden></p>
+
+        <label class="mt-4 block text-base font-semibold" for="whatsapp">{F.whatsapp}
+          <input id="whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder={F.whatsapp_ayuda} required class={campo} />
+        </label>
+        <p id="err-whatsapp" class="mt-1 text-sm font-medium text-red-700" hidden></p>
+
+        <label class="mt-4 block text-base font-semibold" for="correo">{F.correo}
+          <input id="correo" name="correo" type="email" inputmode="email" autocomplete="email" class={campo} />
+          <span class="mt-1 block text-sm font-normal text-oceano-700">{F.correo_ayuda}</span>
+        </label>
+        <p id="err-correo" class="mt-1 text-sm font-medium text-red-700" hidden></p>
+
+        <fieldset class="mt-4">
+          <legend class="text-base font-semibold">{F.celebracion}</legend>
+          <input type="hidden" id="celebracion" name="celebracion" value="" />
+          <div class="mt-2 flex flex-wrap gap-2">
+            {F.celebracion_opciones.map((o) => (
+              <button type="button" data-chip={o} aria-pressed="false" class="min-h-11 rounded-full border-2 border-oceano-700/25 bg-white px-4 text-base aria-pressed:border-turquesa-500 aria-pressed:bg-turquesa-500 aria-pressed:text-white">{o}</button>
+            ))}
+          </div>
+        </fieldset>
+
+        <label class="mt-5 flex items-start gap-3 text-sm leading-snug text-oceano-900" for="consentimiento">
+          <input id="consentimiento" name="consentimiento" type="checkbox" class="mt-0.5 h-6 w-6 shrink-0 accent-turquesa-500" />
+          <span>{C.casilla}</span>
+        </label>
+
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
+          <label>No llenar este campo <input type="text" name="sitio_web" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <button id="btn-enviar" type="submit" class="mt-6 inline-flex min-h-14 w-full items-center justify-center rounded-full bg-oceano-900 px-6 text-lg font-extrabold text-white shadow-md transition hover:bg-oceano-700 disabled:opacity-70">{F.boton}</button>
+        <p id="form-msg" class="mt-4 rounded-xl bg-red-50 px-4 py-3 text-base text-red-800" role="status" aria-live="polite" hidden></p>
+        <p class="mt-4 text-sm text-oceano-900/75">{C.linea_informativa} <a href="/privacidad/" class="font-semibold underline">{config.textos.footer.privacidad}</a></p>
+      </form>
+    </div>
+
+    <div id="pase-ticket" hidden>
+      <div class="overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-oceano-700/10">
+        <div class="bg-gradient-to-br from-oceano-900 to-turquesa-500 px-6 py-6 text-center text-white">
+          <p class="text-sm font-semibold uppercase tracking-widest">{config.negocio.nombre}</p>
+          <h2 class="mt-1 text-3xl font-extrabold uppercase">{P.titulo}</h2>
+          <p class="mt-1 text-lg font-bold text-sol-400"><Dato v={config.pase.descuento_texto} /></p>
+        </div>
+        <div class="px-6 py-6 text-center">
+          <p id="t-demo" class="mb-3 rounded-lg bg-red-100 px-3 py-2 text-sm font-bold text-red-800" hidden>{P.demo}</p>
+          <p class="text-sm font-semibold uppercase tracking-wide text-oceano-700">{P.titular_de}</p>
+          <p id="t-nombre" class="text-2xl font-extrabold"></p>
+          <canvas id="t-qr" class="mx-auto mt-4 h-44 w-44" style="image-rendering:pixelated" role="img" aria-label="Código QR del Pase"></canvas>
+          <p class="mt-3 text-sm font-semibold uppercase tracking-wide text-oceano-700">{P.codigo}</p>
+          <p id="t-codigo" class="font-mono text-4xl font-black tracking-wider"></p>
+          <p id="t-vigencia" class="mt-2 text-base font-semibold text-oceano-700"></p>
+          <p class="mt-2 text-base">{P.dias}: <Dato v={config.pase.dias_validos} /></p>
+          <p class="mt-1 text-base">{P.excluidas}: <Dato v={config.pase.fechas_excluidas_alta_demanda} /></p>
+          <p class="mt-1 text-base font-semibold">{P.cupos}: <Dato v={config.pase.cupos_totales} /></p>
+          <ul class="mt-4 space-y-1 text-left text-sm text-oceano-900/80">
+            {config.pase.condiciones.map((c) => <li class="flex gap-2"><span aria-hidden="true">•</span><span>{c}</span></li>)}
+          </ul>
+        </div>
+      </div>
+
+      <p id="t-aviso" class="mt-4 rounded-xl bg-white px-4 py-3 text-center text-base" role="status" hidden></p>
+      <div class="mt-5 flex flex-col gap-3">
+        <a id="t-wsp" href="#sin-whatsapp" data-wsp="ticket" class="inline-flex min-h-14 items-center justify-center rounded-full bg-emerald-600 px-6 text-lg font-extrabold text-white shadow-md hover:bg-emerald-700">{P.reservar}</a>
+        <button id="t-guardar" type="button" class="inline-flex min-h-12 items-center justify-center rounded-full border-2 border-oceano-900 bg-white px-6 text-base font-bold text-oceano-900">{P.guardar}</button>
+        <button id="t-copiar" type="button" class="inline-flex min-h-12 items-center justify-center rounded-full px-6 text-base font-semibold text-oceano-700 underline">{P.copiar}</button>
+      </div>
+      <div id="t-imagen-wrap" class="mt-4 text-center" hidden>
+        <p id="t-imagen-ayuda" class="mb-2 text-base font-semibold"></p>
+        <img id="t-imagen" alt="Tu Pase de Apertura" class="mx-auto w-full max-w-sm rounded-2xl shadow-lg" />
+      </div>
+      <p class="mt-5 text-center"><button id="t-cambiar" type="button" class="min-h-11 text-sm text-oceano-700 underline">Usar otro WhatsApp</button></p>
+    </div>
+  </div>
+</section>
+<script>
+  import '../scripts/pase.ts';
+</script>

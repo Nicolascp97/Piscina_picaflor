@@ -1,0 +1,25 @@
+---
+import { config } from '../lib/config';
+import Dato from './Dato.astro';
+const C = config.textos.como;
+---
+<section class="bg-white px-5 py-12 sm:py-16">
+  <div class="mx-auto max-w-3xl">
+    <h2 class="text-3xl font-extrabold">{C.titulo}</h2>
+    <ol class="mt-6 space-y-4">
+      {C.pasos.map((p, i) => (
+        <li class="flex gap-4 rounded-2xl bg-espuma-100 p-4">
+          <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-oceano-900 text-xl font-extrabold text-white">{i + 1}</span>
+          <div><h3 class="text-xl font-bold">{p.t}</h3><p class="mt-1 text-base text-oceano-900/85">{p.d}</p></div>
+        </li>
+      ))}
+    </ol>
+    <div class="mt-6 rounded-2xl border-2 border-dashed border-turquesa-500 p-4 text-base">
+      <p class="font-bold">Condiciones del Pase</p>
+      <ul class="mt-2 space-y-1">
+        {config.pase.condiciones.map((c) => <li class="flex gap-2"><span aria-hidden="true">•</span><span>{c}</span></li>)}
+      </ul>
+      <p class="mt-2">Días válidos: <Dato v={config.pase.dias_validos} />. No vale en: <Dato v={config.pase.fechas_excluidas_alta_demanda} />. Válido hasta: <Dato v={config.pase.vigencia_hasta} />.</p>
+    </div>
+  </div>
+</section>

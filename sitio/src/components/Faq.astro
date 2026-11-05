@@ -1,0 +1,21 @@
+---
+import { config } from '../lib/config';
+const preguntas = config.faq as { p: string; r: string }[];
+---
+{preguntas.length > 0 && (
+  <section class="bg-espuma-100 px-5 py-12 sm:py-16">
+    <div class="mx-auto max-w-3xl">
+      <h2 class="text-3xl font-extrabold">{config.textos.faq.titulo}</h2>
+      <div class="mt-6 space-y-3">
+        {preguntas.map((q) => (
+          <details class="rounded-2xl bg-white px-5 py-4 shadow-sm ring-1 ring-oceano-700/10">
+            <summary class="flex min-h-11 items-center justify-between gap-4 text-lg font-bold">
+              <span>{q.p}</span><span class="mas text-2xl transition-transform" aria-hidden="true">+</span>
+            </summary>
+            <p class="mt-2 text-base text-oceano-900/85">{q.r}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

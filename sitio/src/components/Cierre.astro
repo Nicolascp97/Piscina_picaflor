@@ -1,0 +1,14 @@
+---
+import { config, waLink } from '../lib/config';
+const C = config.textos.cierre;
+---
+<section class="bg-gradient-to-br from-oceano-950 via-oceano-900 to-oceano-700 px-5 py-14 text-center text-white sm:py-20">
+  <div class="mx-auto max-w-2xl">
+    <h2 class="text-3xl font-extrabold sm:text-4xl">{C.titulo}</h2>
+    <p class="mt-3 text-lg text-white/90">{C.bajada}</p>
+    <div class="mt-7 flex flex-col items-center gap-3">
+      <a href="#pase" class="inline-flex min-h-14 w-full max-w-sm items-center justify-center rounded-full bg-sol-400 px-8 text-lg font-extrabold text-oceano-950 shadow-lg hover:bg-sol-500">{config.textos.hero.cta}</a>
+      <a href={waLink(config.whatsapp_mensajes.general)} data-wsp="cierre" class="inline-flex min-h-12 items-center justify-center rounded-full px-5 text-base font-semibold underline decoration-turquesa-300 underline-offset-4">{config.textos.whatsapp.boton}</a>
+    </div>
+  </div>
+</section>
