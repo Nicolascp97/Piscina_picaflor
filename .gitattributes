@@ -4,3 +4,10 @@ CLAUDE.md text eol=lf
 PLAN-LANDING-2026-11.md text eol=lf
 sitio/** text eol=lf
 apps-script/** text eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.heic binary
+*.mp4 binary
