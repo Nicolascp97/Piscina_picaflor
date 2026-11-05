@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm --prefix sitio install",
+  "buildCommand": "PUBLIC_MODO_AVANCE=1 npm --prefix sitio run build",
+  "outputDirectory": "sitio/dist"
+}
